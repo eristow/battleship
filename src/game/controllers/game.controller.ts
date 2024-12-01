@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Post,
   UsePipes,
@@ -8,10 +9,18 @@ import {
 } from '@nestjs/common';
 import { GameService } from '../providers/game.service';
 import { CreateGameDto } from '../dto/create-game.dto';
+import { JoinGameDto } from '../dto/join-game.dto';
+import { Game } from '../entities/game.entity';
+import { MakeMoveDto } from '../dto/make-move.dto';
 
 @Controller('games')
 export class GameController {
   constructor(private readonly gameService: GameService) {}
+
+  @Get()
+  async getAllGames(): Promise<Game[]> {
+    return this.gameService.getAllGames();
+  }
 
   @Post()
   @UsePipes(new ValidationPipe())
@@ -20,14 +29,16 @@ export class GameController {
   }
 
   @Post(':gameId/join')
+  @UsePipes(new ValidationPipe())
   async joinGame(
     @Param('gameId') gameId: string,
-    @Body('playerTwoId') playerTwoId: string,
+    @Body() joinGameDto: JoinGameDto,
   ) {
-    return this.gameService.joinGame(gameId, playerTwoId);
+    return this.gameService.joinGame(gameId, joinGameDto);
   }
 
   @Post(':gameId/move')
+  @UsePipes(new ValidationPipe())
   async makeMove(
     @Param('gameId') gameId: string,
     @Body() moveDto: MakeMoveDto,

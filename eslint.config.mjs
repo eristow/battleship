@@ -39,7 +39,8 @@ export default [
 
       parserOptions: {
         project: 'tsconfig.json',
-        tsconfigRootDir: '/home/eristow/projects/battleship',
+        // tsconfigRootDir: '/home/eristow/projects/battleship',
+        tsconfigRootDir: __dirname,
       },
     },
 

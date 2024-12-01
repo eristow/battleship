@@ -1,4 +1,4 @@
-import { Ship } from '../game.class';
+import { Ship } from './ship.model';
 
 export enum CellState {
   EMPTY,
@@ -19,7 +19,7 @@ export class Board {
   private ships: Ship[];
 
   // TODO: move the default board size to a config service.
-  constructor(size: number = 10) {
+  constructor(public size: number = 10) {
     this.initializeGrid(size);
   }
 
@@ -45,9 +45,13 @@ export class Board {
     // shipCells.forEach(({ x, y }) => {
     // 	this.grid[y][x].state = CellState.SHIP;
     // });
+    console.log(`${JSON.stringify(ship)} ${startX} ${startY} ${isHorizontal}`);
+    return true;
   }
 
   receiveAttack(x: number, y: number): CellState {
     // TODO: Implement this method.
+    console.log(`${x} ${y}`);
+    return CellState.EMPTY;
   }
 }

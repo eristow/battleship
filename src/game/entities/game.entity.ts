@@ -5,6 +5,17 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Board } from '../models/board.model';
+import { ShipConfig } from '../dto/create-game.dto';
+import { User } from '../../users/entities/user.entity';
+
+export enum GameStatus {
+  SETUP = 'SETUP',
+  WAITING_FOR_PLAYER_TWO = 'WAITING_FOR_PLAYER_TWO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  PLAYER_ONE_WIN = 'PLAYER_ONE_WIN',
+  PLAYER_TWO_WIN = 'PLAYER_TWO_WIN',
+}
 
 @Entity()
 export class Game {
@@ -25,15 +36,17 @@ export class Game {
   status: GameStatus;
 
   @Column('json')
-  board: Board;
+  playerOneBoard: Board;
+
+  @Column('json')
+  playerTwoBoard: Board;
+
+  @Column('json')
+  playerOneShips: ShipConfig[];
+
+  @Column('json')
+  playerTwoShips: ShipConfig[];
 
   @CreateDateColumn()
   createdAt: Date;
-}
-
-export enum GameStatus {
-  SETUP = 'SETUP',
-  IN_PROGRESS = 'IN_PROGRESS',
-  PLAYER_ONE_WIN = 'PLAYER_ONE_WIN',
-  PLAYER_TWO_WIN = 'PLAYER_TWO_WIN',
 }

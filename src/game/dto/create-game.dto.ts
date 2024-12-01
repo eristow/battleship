@@ -6,6 +6,8 @@ export class CreateGameDto {
 
 export interface ShipConfig {
   name: string;
-  count: number;
   length: number;
+  startX: number;
+  startY: number;
+  isHorizontal: boolean;
 }
