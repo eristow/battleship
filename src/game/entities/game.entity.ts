@@ -12,7 +12,8 @@ import { User } from '../../users/entities/user.entity';
 export enum GameStatus {
   SETUP = 'SETUP',
   WAITING_FOR_PLAYER_TWO = 'WAITING_FOR_PLAYER_TWO',
-  IN_PROGRESS = 'IN_PROGRESS',
+  PLAYER_ONE_TURN = 'PLAYER_ONE_TURN',
+  PLAYER_TWO_TURN = 'PLAYER_TWO_TURN',
   PLAYER_ONE_WIN = 'PLAYER_ONE_WIN',
   PLAYER_TWO_WIN = 'PLAYER_TWO_WIN',
 }
@@ -25,7 +26,7 @@ export class Game {
   @ManyToOne(() => User)
   playerOne: User;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: true })
   playerTwo: User;
 
   @Column({
@@ -38,13 +39,13 @@ export class Game {
   @Column('json')
   playerOneBoard: Board;
 
-  @Column('json')
+  @Column('json', { nullable: true })
   playerTwoBoard: Board;
 
   @Column('json')
   playerOneShips: ShipConfig[];
 
-  @Column('json')
+  @Column('json', { nullable: true })
   playerTwoShips: ShipConfig[];
 
   @CreateDateColumn()

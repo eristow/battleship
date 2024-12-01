@@ -41,11 +41,9 @@ export class Board {
     isHorizontal: boolean,
   ): boolean {
     // TODO: Implement this method.
-    // const shipCells = this.getShipCells(ship, startX, startY, isHorizontal);
-    // shipCells.forEach(({ x, y }) => {
-    // 	this.grid[y][x].state = CellState.SHIP;
-    // });
-    console.log(`${JSON.stringify(ship)} ${startX} ${startY} ${isHorizontal}`);
+    console.log(
+      `placeShip: ${JSON.stringify(ship)} ${startX} ${startY} ${isHorizontal}`,
+    );
     return true;
   }
 
@@ -53,5 +51,9 @@ export class Board {
     // TODO: Implement this method.
     console.log(`${x} ${y}`);
     return CellState.EMPTY;
+  }
+
+  checkGameOver(): boolean {
+    return this.ships.every((ship) => ship.isSunk());
   }
 }

@@ -25,15 +25,12 @@ export class GameService {
 
   async createGame(createGameDto: CreateGameDto): Promise<Game> {
     // TODO: move the default board size to a config service.
-    const board1 = new Board(createGameDto.boardSize || 10);
-    const board2 = new Board(createGameDto.boardSize || 10);
+    const board1 = new Board(10);
 
     // TODO: extract ship validation into a separate function
     const playerOneShipsPlaced = createGameDto.playerOneShips.every(
       (shipConfig) => {
         const ship = new Ship(shipConfig.name, shipConfig.length);
-        console.log('New ship:');
-        console.table(ship);
 
         const shipPlaced = board1.placeShip(
           ship,
@@ -41,8 +38,6 @@ export class GameService {
           shipConfig.startY,
           shipConfig.isHorizontal,
         );
-
-        console.log(`shipPlaced: ${shipPlaced}`);
 
         return shipPlaced;
       },
@@ -53,18 +48,11 @@ export class GameService {
       throw new BadRequestException('Invalid ship placement for Player One');
     }
 
-    // TODO: fix error
-    /*
-      UpdateValuesMissingError: Cannot perform update query because update values are not defined. Call "qb.set(...)" method to specify updated values.
-    */
     const game = this.gameRepository.create({
       playerOne: { id: createGameDto.playerOneId },
-      playerTwo: {},
       status: GameStatus.WAITING_FOR_PLAYER_TWO,
       playerOneBoard: board1,
-      playerTwoBoard: board2,
       playerOneShips: createGameDto.playerOneShips,
-      playerTwoShips: [],
     });
 
     return this.gameRepository.save(game);
@@ -108,7 +96,7 @@ export class GameService {
     game.playerTwo = { id: joinGameDto.playerTwoId, username: '' };
     game.playerTwoBoard = boardPlayerTwo;
     game.playerTwoShips = joinGameDto.playerTwoShips;
-    game.status = GameStatus.IN_PROGRESS;
+    game.status = GameStatus.PLAYER_ONE_TURN;
 
     return this.gameRepository.save(game);
   }
@@ -175,8 +163,23 @@ export class GameService {
     x: number,
     y: number,
   ): void {
-    // TODO: implement this method
-    console.log(`${game} ${playerId} ${x} ${y}`);
+    const isPlayerOneAttacking = game.playerOne.id === playerId;
+    if (isPlayerOneAttacking && game.status !== GameStatus.PLAYER_ONE_TURN) {
+      throw new BadRequestException("Not player one's turn");
+    }
+    if (!isPlayerOneAttacking && game.status !== GameStatus.PLAYER_TWO_TURN) {
+      throw new BadRequestException("Not player two's turn");
+    }
+
+    // TODO: change to use board size from config service
+    if (
+      x < 0 ||
+      x >= game.playerOneBoard.size ||
+      y < 0 ||
+      y >= game.playerOneBoard.size
+    ) {
+      throw new BadRequestException('Invalid attack coordinates');
+    }
   }
 
   private findSunkShip(
@@ -193,17 +196,26 @@ export class GameService {
     };
   }
 
-  private checkGameOver(board: Board): boolean {
-    // TODO: Implement this method
-    console.log(`${board}`);
-    return false;
+  private checkGameOver(targetBoard: Board): boolean {
+    return targetBoard.checkGameOver();
   }
 
   private async updateGameState(
     game: Game,
     moveResult: MoveResult,
   ): Promise<void> {
-    // TODO: implement this method
-    console.log(`${game} ${moveResult}`);
+    if (moveResult.isGameOver) {
+      game.status =
+        moveResult.winnerId === game.playerOne.id
+          ? GameStatus.PLAYER_ONE_WIN
+          : GameStatus.PLAYER_TWO_WIN;
+    } else {
+      game.status =
+        game.status === GameStatus.PLAYER_ONE_TURN
+          ? GameStatus.PLAYER_TWO_TURN
+          : GameStatus.PLAYER_ONE_TURN;
+    }
+
+    await this.gameRepository.save(game);
   }
 }

@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   UsePipes,
   ValidationPipe,
@@ -31,7 +32,7 @@ export class GameController {
   @Post(':gameId/join')
   @UsePipes(new ValidationPipe())
   async joinGame(
-    @Param('gameId') gameId: string,
+    @Param('gameId', new ParseUUIDPipe()) gameId: string,
     @Body() joinGameDto: JoinGameDto,
   ) {
     return this.gameService.joinGame(gameId, joinGameDto);
@@ -40,7 +41,7 @@ export class GameController {
   @Post(':gameId/move')
   @UsePipes(new ValidationPipe())
   async makeMove(
-    @Param('gameId') gameId: string,
+    @Param('gameId', new ParseUUIDPipe()) gameId: string,
     @Body() moveDto: MakeMoveDto,
   ) {
     return this.gameService.makeMove(
