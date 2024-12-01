@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Board } from '../models/board.model';
+import { Board } from '../classes/board.class';
 import { ShipConfig } from '../dto/create-game.dto';
 import { User } from '../../users/entities/user.entity';
 

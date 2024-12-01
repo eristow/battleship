@@ -1,4 +1,4 @@
-import { Ship } from './ship.model';
+import { Ship } from './ship.class';
 
 export enum CellState {
   EMPTY,
@@ -18,8 +18,7 @@ export class Board {
   private grid: Cell[][];
   private ships: Ship[];
 
-  // TODO: move the default board size to a config service.
-  constructor(public size: number = 10) {
+  constructor(public size: number) {
     this.initializeGrid(size);
   }
 

@@ -3,18 +3,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateGameDto } from '../dto/create-game.dto';
 import { Game, GameStatus } from '../entities/game.entity';
-import { Board, CellState } from '../models/board.model';
-import { Ship } from '../models/ship.model';
+import { Board, CellState } from '../classes/board.class';
+import { Ship } from '../classes/ship.class';
 import { JoinGameDto } from '../dto/join-game.dto';
 import {
   AttackOutcome,
   MoveResult,
   ShipInfo,
-} from '../models/move-result.model';
+} from '../classes/move-result.class';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GameService {
   constructor(
+    private configService: ConfigService,
+
     @InjectRepository(Game)
     private gameRepository: Repository<Game>,
   ) {}
@@ -24,8 +27,7 @@ export class GameService {
   }
 
   async createGame(createGameDto: CreateGameDto): Promise<Game> {
-    // TODO: move the default board size to a config service.
-    const board1 = new Board(10);
+    const board1 = new Board(this.configService.get('BOARD_SIZE'));
 
     // TODO: extract ship validation into a separate function
     const playerOneShipsPlaced = createGameDto.playerOneShips.every(
