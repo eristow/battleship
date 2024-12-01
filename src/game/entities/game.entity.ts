@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Board } from '../classes/board.class';
+import { Board, BoardConfig } from '../classes/board.class';
 import { ShipConfig } from '../dto/create-game.dto';
 import { User } from '../../users/entities/user.entity';
 
@@ -17,6 +17,16 @@ export enum GameStatus {
   PLAYER_ONE_WIN = 'PLAYER_ONE_WIN',
   PLAYER_TWO_WIN = 'PLAYER_TWO_WIN',
 }
+
+const boardTransformer = {
+  to: (value: Board) => value.toJSON(),
+  from: (value: BoardConfig) => {
+    const board = new Board(value.size);
+    board.setGrid(value.grid);
+    board.setShips(value.ships);
+    return board;
+  },
+};
 
 @Entity()
 export class Game {
@@ -36,7 +46,7 @@ export class Game {
   })
   status: GameStatus;
 
-  @Column('json')
+  @Column({ type: 'json', transformer: boardTransformer })
   playerOneBoard: Board;
 
   @Column('json', { nullable: true })

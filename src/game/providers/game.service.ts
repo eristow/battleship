@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateGameDto } from '../dto/create-game.dto';
+import { CreateGameDto, ShipConfig } from '../dto/create-game.dto';
 import { Game, GameStatus } from '../entities/game.entity';
 import { Board, CellState } from '../classes/board.class';
 import { Ship } from '../classes/ship.class';
@@ -27,22 +27,11 @@ export class GameService {
   }
 
   async createGame(createGameDto: CreateGameDto): Promise<Game> {
-    const board1 = new Board(this.configService.get('BOARD_SIZE'));
+    const boardPlayerOne = new Board(this.configService.get('BOARD_SIZE'));
 
-    // TODO: extract ship validation into a separate function
-    const playerOneShipsPlaced = createGameDto.playerOneShips.every(
-      (shipConfig) => {
-        const ship = new Ship(shipConfig.name, shipConfig.length);
-
-        const shipPlaced = board1.placeShip(
-          ship,
-          shipConfig.startX,
-          shipConfig.startY,
-          shipConfig.isHorizontal,
-        );
-
-        return shipPlaced;
-      },
+    const playerOneShipsPlaced = this.placeShips(
+      createGameDto.playerOneShips,
+      boardPlayerOne,
     );
 
     if (!playerOneShipsPlaced) {
@@ -53,7 +42,7 @@ export class GameService {
     const game = this.gameRepository.create({
       playerOne: { id: createGameDto.playerOneId },
       status: GameStatus.WAITING_FOR_PLAYER_TWO,
-      playerOneBoard: board1,
+      playerOneBoard: boardPlayerOne,
       playerOneShips: createGameDto.playerOneShips,
     });
 
@@ -76,18 +65,9 @@ export class GameService {
 
     const boardPlayerTwo = new Board(game.playerOneBoard.size);
 
-    // TODO: extract ship validation into a separate function
-    const playerTwoShipsPlaced = joinGameDto.playerTwoShips.every(
-      (shipConfig) => {
-        const ship = new Ship(shipConfig.name, shipConfig.length);
-
-        return boardPlayerTwo.placeShip(
-          ship,
-          shipConfig.startX,
-          shipConfig.startY,
-          shipConfig.isHorizontal,
-        );
-      },
+    const playerTwoShipsPlaced = this.placeShips(
+      joinGameDto.playerTwoShips,
+      boardPlayerTwo,
     );
 
     if (!playerTwoShipsPlaced) {
@@ -101,6 +81,19 @@ export class GameService {
     game.status = GameStatus.PLAYER_ONE_TURN;
 
     return this.gameRepository.save(game);
+  }
+
+  placeShips(shipConfig: ShipConfig[], targetBoard: Board): boolean {
+    return shipConfig.every((shipConfig) => {
+      const ship = new Ship(shipConfig.name, shipConfig.length);
+
+      return targetBoard.placeShip(
+        ship,
+        shipConfig.startX,
+        shipConfig.startY,
+        shipConfig.isHorizontal,
+      );
+    });
   }
 
   async makeMove(
@@ -120,6 +113,8 @@ export class GameService {
     const targetBoard = isPlayerOneAttacking
       ? game.playerTwoBoard
       : game.playerOneBoard;
+
+    console.log(JSON.stringify(targetBoard));
 
     const cellState = targetBoard.receiveAttack(x, y);
 
@@ -159,12 +154,26 @@ export class GameService {
     return moveResult;
   }
 
+  private rebuildBoard(boardData: any, ships: any): Board {
+    const board = new Board(boardData.size);
+
+    board.setGrid(boardData.grid);
+
+    board.setShips(ships);
+
+    return board;
+  }
+
   private validateMove(
     game: Game,
     playerId: string,
     x: number,
     y: number,
   ): void {
+    if (game.playerOne.id !== playerId && game.playerTwo.id !== playerId) {
+      throw new BadRequestException('Invalid player id');
+    }
+
     const isPlayerOneAttacking = game.playerOne.id === playerId;
     if (isPlayerOneAttacking && game.status !== GameStatus.PLAYER_ONE_TURN) {
       throw new BadRequestException("Not player one's turn");

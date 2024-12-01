@@ -9,4 +9,5 @@ export interface ShipConfig {
   startX: number;
   startY: number;
   isHorizontal: boolean;
+  currentHits?: number;
 }

@@ -5,6 +5,10 @@ export class Ship {
     private currentHits: number = 0,
   ) {}
 
+  getCurrentHits(): number {
+    return this.currentHits;
+  }
+
   hit(): void {
     this.currentHits++;
   }
