@@ -2,12 +2,11 @@ export class Ship {
   constructor(
     public name: string,
     public length: number,
-    private currentHits: number = 0,
+    public startX: number,
+    public startY: number,
+    public isHorizontal: boolean,
+    public currentHits: number = 0,
   ) {}
-
-  getCurrentHits(): number {
-    return this.currentHits;
-  }
 
   hit(): void {
     this.currentHits++;

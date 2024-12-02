@@ -6,7 +6,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Board, BoardConfig } from '../classes/board.class';
-import { ShipConfig } from '../dto/create-game.dto';
 import { User } from '../../users/entities/user.entity';
 
 export enum GameStatus {
@@ -49,14 +48,14 @@ export class Game {
   @Column({ type: 'json', transformer: boardTransformer })
   playerOneBoard: Board;
 
-  @Column('json', { nullable: true })
+  @Column({ type: 'json', transformer: boardTransformer, nullable: true })
   playerTwoBoard: Board;
 
-  @Column('json')
-  playerOneShips: ShipConfig[];
+  // @Column('json')
+  // playerOneShips: ShipConfig[];
 
-  @Column('json', { nullable: true })
-  playerTwoShips: ShipConfig[];
+  // @Column('json', { nullable: true })
+  // playerTwoShips: ShipConfig[];
 
   @CreateDateColumn()
   createdAt: Date;

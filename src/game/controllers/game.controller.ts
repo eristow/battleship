@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -13,6 +14,7 @@ import { CreateGameDto } from '../dto/create-game.dto';
 import { JoinGameDto } from '../dto/join-game.dto';
 import { Game } from '../entities/game.entity';
 import { MakeMoveDto } from '../dto/make-move.dto';
+import { MoveResult } from '../classes/move-result.class';
 
 @Controller('games')
 export class GameController {
@@ -26,7 +28,13 @@ export class GameController {
   @Post()
   @UsePipes(new ValidationPipe())
   async createGame(@Body() createGameDto: CreateGameDto): Promise<Game> {
-    return this.gameService.createGame(createGameDto);
+    const createdGame = await this.gameService.createGame(createGameDto);
+
+    if (!createdGame) {
+      throw new BadRequestException('Failed to create game');
+    }
+
+    return createdGame;
   }
 
   @Post(':gameId/join')
@@ -34,8 +42,14 @@ export class GameController {
   async joinGame(
     @Param('gameId', new ParseUUIDPipe()) gameId: string,
     @Body() joinGameDto: JoinGameDto,
-  ) {
-    return this.gameService.joinGame(gameId, joinGameDto);
+  ): Promise<Game> {
+    const joinedGame = this.gameService.joinGame(gameId, joinGameDto);
+
+    if (!joinedGame) {
+      throw new BadRequestException('Failed to join game');
+    }
+
+    return joinedGame;
   }
 
   @Post(':gameId/move')
@@ -43,7 +57,7 @@ export class GameController {
   async makeMove(
     @Param('gameId', new ParseUUIDPipe()) gameId: string,
     @Body() moveDto: MakeMoveDto,
-  ) {
+  ): Promise<MoveResult> {
     return this.gameService.makeMove(
       gameId,
       moveDto.playerId,

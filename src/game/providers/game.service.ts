@@ -43,10 +43,11 @@ export class GameService {
       playerOne: { id: createGameDto.playerOneId },
       status: GameStatus.WAITING_FOR_PLAYER_TWO,
       playerOneBoard: boardPlayerOne,
-      playerOneShips: createGameDto.playerOneShips,
     });
 
-    return this.gameRepository.save(game);
+    const createdGame = this.gameRepository.save(game);
+
+    return createdGame;
   }
 
   async joinGame(gameId: string, joinGameDto: JoinGameDto): Promise<Game> {
@@ -74,25 +75,36 @@ export class GameService {
       throw new BadRequestException('Invalid ship placement for player two');
     }
 
-    // TODO: do I need to give the username here, or can I pull it from the User DB?
-    game.playerTwo = { id: joinGameDto.playerTwoId, username: '' };
-    game.playerTwoBoard = boardPlayerTwo;
-    game.playerTwoShips = joinGameDto.playerTwoShips;
-    game.status = GameStatus.PLAYER_ONE_TURN;
+    const updateResult = await this.gameRepository.update(gameId, {
+      playerTwo: { id: joinGameDto.playerTwoId },
+      playerTwoBoard: boardPlayerTwo,
+      status: GameStatus.PLAYER_ONE_TURN,
+    });
 
-    return this.gameRepository.save(game);
+    console.log(JSON.stringify(updateResult));
+
+    if (updateResult.affected === 0) {
+      throw new BadRequestException('Failed to join game');
+    }
+
+    return await this.gameRepository.findOne({
+      where: { id: gameId },
+      relations: ['playerOne', 'playerTwo'],
+    });
   }
 
   placeShips(shipConfig: ShipConfig[], targetBoard: Board): boolean {
     return shipConfig.every((shipConfig) => {
-      const ship = new Ship(shipConfig.name, shipConfig.length);
-
-      return targetBoard.placeShip(
-        ship,
+      const ship = new Ship(
+        shipConfig.name,
+        shipConfig.length,
         shipConfig.startX,
         shipConfig.startY,
         shipConfig.isHorizontal,
+        shipConfig.currentHits,
       );
+
+      return targetBoard.placeShip(ship);
     });
   }
 
@@ -152,16 +164,6 @@ export class GameService {
     await this.updateGameState(game, moveResult);
 
     return moveResult;
-  }
-
-  private rebuildBoard(boardData: any, ships: any): Board {
-    const board = new Board(boardData.size);
-
-    board.setGrid(boardData.grid);
-
-    board.setShips(ships);
-
-    return board;
   }
 
   private validateMove(

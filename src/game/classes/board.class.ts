@@ -22,7 +22,7 @@ export interface BoardConfig {
 
 export class Board {
   private grid: Cell[][];
-  private ships: Ship[];
+  private ships: Ship[] = [];
 
   constructor(public size: number) {
     this.initializeGrid(size);
@@ -37,16 +37,18 @@ export class Board {
   }
 
   // Returns if the desired placement is valid.
-  placeShip(
-    ship: Ship,
-    startX: number,
-    startY: number,
-    isHorizontal: boolean,
-  ): boolean {
-    // TODO: Implement this method.
-    console.log(
-      `placeShip: ${JSON.stringify(ship)} ${startX} ${startY} ${isHorizontal}`,
-    );
+  placeShip(ship: Ship): boolean {
+    // TODO: Add validation for ship out of grid bounds.
+    // TODO: Add validation for ship overlap.
+    // TODO: Actually place the ship on the grid.
+    this.ships.push(ship);
+
+    for (let i = 0; i < ship.length; i++) {
+      const x = ship.isHorizontal ? ship.startX + i : ship.startX;
+      const y = ship.isHorizontal ? ship.startY : ship.startY + i;
+      this.grid[y][x].state = CellState.SHIP;
+    }
+
     return true;
   }
 
@@ -85,7 +87,15 @@ export class Board {
 
   setShips(ships: Ship[]): void {
     this.ships = ships.map(
-      (ship: Ship) => new Ship(ship.name, ship.length, ship.getCurrentHits()),
+      (ship: Ship) =>
+        new Ship(
+          ship.name,
+          ship.length,
+          ship.startX,
+          ship.startY,
+          ship.isHorizontal,
+          ship.currentHits,
+        ),
     );
   }
 
