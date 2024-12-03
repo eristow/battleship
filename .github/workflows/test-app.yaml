@@ -1,0 +1,21 @@
+name: Test App
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+    - '*'
+
+jobs:
+  test:
+  # TODO: Add a job that runs the tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Retrieve secret
+        env:
+          super_secret: ${{ secrets.SUPERSECRET }}
+        run: |
+          example-command "$super_secret"

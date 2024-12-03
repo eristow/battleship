@@ -2,6 +2,12 @@
 
 - [ ] Change README from boilerplate to project-specific
 
+- [ ] Containerize the app
+  - [ ] Create Dockerfile
+    - [ ] NestJS app
+    - [ ] PSQL server
+  - [ ] Create docker-compose file
+
 - [ ] Add unit tests for `Game` service
 
 - [ ] Add unit tests for `Board` class
@@ -15,17 +21,6 @@
 - [ ] Add unit tests for `User` service
 
 - [ ] Add unit tests for `MoveResult` class
-
-- [ ] Add logging
-  - [ ] Log all requests
-  - [ ] Log all responses
-  - [ ] Log all errors
-
-- [ ] Containerize the app
-  - [ ] Create Dockerfile
-    - [ ] NestJS app
-    - [ ] PSQL server
-  - [ ] Create docker-compose file
 
 - [ ] Add CI/CD pipeline
   - [ ] GitHub Actions
@@ -41,7 +36,6 @@
   - [ ] Deploy app
 
 # STRETCH GOALS:
-- [ ] Improve efficiency of validating placed ships?
 
 - [ ] Add user authentication?
   - https://docs.nestjs.com/security/authentication
@@ -56,8 +50,14 @@
 
 - [ ] Split up `Game` service
 
+- [ ] Add logging for services and classes
+
 # DONE:
 
+- [x] Add logging
+  - [x] Log all requests
+  - [x] Log all responses
+  - [x] Log all errors
 - [x] Create enums and validation for ship types (name, length)
   - [x] Prevent users from providing `currentHits` in ship placement
   - [x] Create endpoint for listing available ships
