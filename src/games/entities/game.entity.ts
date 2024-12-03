@@ -45,6 +45,8 @@ const boardTransformer = {
       board.placeShip(ship);
     });
 
+    board.updateGrid(value.grid);
+
     return board;
   },
 };

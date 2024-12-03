@@ -2,15 +2,6 @@
 
 - [ ] Change README from boilerplate to project-specific
 
-- [ ] Add validation for hitting the same cell twice
-  - Should return an error
-
-- [ ] Create enums and validation for ship types (name, length)
-  - [ ] Create enums
-  - [ ] Implement validation
-  - [ ] Create endpoint for listing available ships
-  - [ ] Change ship placement to use ship type instead of length
-
 - [ ] Add unit tests for `Game` service
 
 - [ ] Add unit tests for `Board` class
@@ -29,17 +20,6 @@
   - [ ] Log all requests
   - [ ] Log all responses
   - [ ] Log all errors
-
-- [ ] Improve error response from validating ship placement
-  - Return what ships are invalid and how
-
-- [ ] Add user authentication?
-  - https://docs.nestjs.com/security/authentication
-  - [ ] Implement JWT
-  - [ ] Implement user registration
-  - [ ] Implement user login
-  - [ ] Implement user logout
-  - [ ] Implement user authentication middleware
 
 - [ ] Containerize the app
   - [ ] Create Dockerfile
@@ -60,8 +40,38 @@
   - [ ] Install Docker Compose
   - [ ] Deploy app
 
+# STRETCH GOALS:
+- [ ] Improve efficiency of validating placed ships?
+
+- [ ] Add user authentication?
+  - https://docs.nestjs.com/security/authentication
+  - [ ] Implement JWT
+  - [ ] Implement user registration
+  - [ ] Implement user login
+  - [ ] Implement user logout
+  - [ ] Implement user authentication middleware
+  - [ ] Protect endpoints with authentication middleware
+    - Create/join/delete game
+    - Make move
+
+- [ ] Split up `Game` service
+
 # DONE:
 
+- [x] Create enums and validation for ship types (name, length)
+  - [x] Prevent users from providing `currentHits` in ship placement
+  - [x] Create endpoint for listing available ships
+  - [x] Create enums
+  - [x] Implement validation
+  - [x] Change ship placement to use ship type instead of length
+  - [x] Ship placement array should have exactly 5 ships, only 1 of each type
+- [x] Improve error response from validating ship placement
+  - Return what ships are invalid and how
+- [x] Add validation for hitting the same cell twice
+  - Should return an error
+- [x] Add validation for making a move on a game that isn't ready yet
+- [x] Add validation for trying to make a move on a game that is over
+  - Should return an error
 - [x] Add deleting game functionality
   - [x] Implement `Game` service method `deleteGame`
   - [x] Create endpoint in `GameController`

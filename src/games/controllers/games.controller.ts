@@ -17,6 +17,7 @@ import { JoinGameDto } from '../dto/join-game.dto';
 import { Game, GameSummary } from '../entities/game.entity';
 import { MakeMoveDto } from '../dto/make-move.dto';
 import { MoveResult } from '../classes/move-result.class';
+import { ShipSummary } from '../classes/ship.class';
 
 @Controller('games')
 export class GamesController {
@@ -25,6 +26,11 @@ export class GamesController {
   @Get()
   async getAllGames(): Promise<GameSummary[]> {
     return this.gameService.getAllGames();
+  }
+
+  @Get('ships')
+  getValidShips(): ShipSummary[] {
+    return this.gameService.getValidShips();
   }
 
   @Get(':gameId')

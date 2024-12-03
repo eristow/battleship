@@ -1,17 +1,19 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateGameDto, ShipConfig } from '../dto/create-game.dto';
+import { CreateGameDto } from '../dto/create-game.dto';
 import { Game, GameStatus, GameSummary } from '../entities/game.entity';
 import { Board, CellState } from '../classes/board.class';
-import { Ship } from '../classes/ship.class';
+import { Ship, ShipSummary } from '../classes/ship.class';
 import { JoinGameDto } from '../dto/join-game.dto';
-import {
-  AttackOutcome,
-  MoveResult,
-  ShipInfo,
-} from '../classes/move-result.class';
+import { AttackOutcome, MoveResult } from '../classes/move-result.class';
 import { ConfigService } from '@nestjs/config';
+import { SHIP_LENGTHS, ShipConfig, ShipType } from '../dto/ship-config.dto';
+
+interface ShipValidationResult {
+  isValid: boolean;
+  error?: string;
+}
 
 @Injectable()
 export class GamesService {
@@ -49,6 +51,13 @@ export class GamesService {
     return game;
   }
 
+  getValidShips(): ShipSummary[] {
+    return Object.entries(SHIP_LENGTHS).map(([name, length]) => ({
+      name: name as ShipType,
+      length,
+    }));
+  }
+
   async deleteGame(gameId: string): Promise<boolean> {
     const deleteResult = await this.gameRepository.delete(gameId);
 
@@ -56,16 +65,28 @@ export class GamesService {
   }
 
   async createGame(createGameDto: CreateGameDto): Promise<Game> {
+    const validation = this.validateShipTypes(createGameDto.playerOneShips);
+    if (!validation.isValid) {
+      throw new BadRequestException(validation.error);
+    }
+
+    const shipsWithLengths = createGameDto.playerOneShips.map(
+      (ship) =>
+        ({
+          ...ship,
+          length: SHIP_LENGTHS[ship.name],
+        }) as ShipSummary,
+    );
+
     const boardPlayerOne = new Board(this.configService.get('BOARD_SIZE'));
 
     const playerOneShipsPlaced = this.placeShips(
-      createGameDto.playerOneShips,
+      shipsWithLengths,
       boardPlayerOne,
     );
 
-    if (!playerOneShipsPlaced) {
-      // TODO: make this return what ships are invalid and how they are
-      throw new BadRequestException('Invalid ship placement for Player One');
+    if (!playerOneShipsPlaced.valid || playerOneShipsPlaced.error) {
+      throw new BadRequestException(playerOneShipsPlaced.error);
     }
 
     const game = this.gameRepository.create({
@@ -80,6 +101,18 @@ export class GamesService {
   }
 
   async joinGame(gameId: string, joinGameDto: JoinGameDto): Promise<Game> {
+    const validation = this.validateShipTypes(joinGameDto.playerTwoShips);
+    if (!validation.isValid) {
+      throw new BadRequestException(validation.error);
+    }
+
+    const shipsWithLengths = joinGameDto.playerTwoShips.map(
+      (ship) =>
+        ({
+          ...ship,
+          length: SHIP_LENGTHS[ship.name],
+        }) as ShipSummary,
+    );
     const game = await this.gameRepository.findOne({
       where: { id: gameId },
       relations: ['playerOne'],
@@ -96,7 +129,7 @@ export class GamesService {
     const boardPlayerTwo = new Board(game.playerOneBoard.size);
 
     const playerTwoShipsPlaced = this.placeShips(
-      joinGameDto.playerTwoShips,
+      shipsWithLengths,
       boardPlayerTwo,
     );
 
@@ -120,19 +153,73 @@ export class GamesService {
     });
   }
 
-  placeShips(shipConfig: ShipConfig[], targetBoard: Board): boolean {
-    return shipConfig.every((shipConfig) => {
+  private validateShipTypes(ships: ShipConfig[]): ShipValidationResult {
+    const shipCounts = new Map<ShipType, number>();
+
+    for (const ship of ships) {
+      shipCounts.set(ship.name, (shipCounts.get(ship.name) || 0) + 1);
+    }
+
+    // Check for duplicates
+    const duplicates = Array.from(shipCounts.entries())
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .filter(([_, count]) => count > 1)
+      .map(([type]) => type);
+
+    if (duplicates.length > 0) {
+      return {
+        isValid: false,
+        error: `Duplicate ships found: ${duplicates.join(', ')}`,
+      };
+    }
+
+    // Check for missing types
+    const missingTypes = Object.values(ShipType).filter(
+      (type) => !shipCounts.has(type),
+    );
+
+    if (missingTypes.length > 0) {
+      return {
+        isValid: false,
+        error: `Missing ship types: ${missingTypes.join(', ')}`,
+      };
+    }
+
+    return { isValid: true };
+  }
+
+  placeShips(
+    shipConfig: ShipSummary[],
+    targetBoard: Board,
+  ): { valid: boolean; error?: string } {
+    let invalidShip = null;
+    let errorDetails = '';
+
+    const shipPlaced = shipConfig.every((shipConfig) => {
       const ship = new Ship(
         shipConfig.name,
         shipConfig.length,
         shipConfig.startX,
         shipConfig.startY,
         shipConfig.isHorizontal,
-        shipConfig.currentHits,
       );
 
-      return targetBoard.placeShip(ship);
+      const { valid, error } = targetBoard.placeShip(ship);
+
+      if (!valid) {
+        invalidShip = ship;
+        errorDetails = error;
+      }
+      return valid;
     });
+
+    return {
+      valid: shipPlaced,
+      error:
+        invalidShip && errorDetails
+          ? `Invalid ship placement: ${invalidShip.name}. ${errorDetails}.`
+          : undefined,
+    };
   }
 
   async makeMove(
@@ -157,10 +244,16 @@ export class GamesService {
       ? game.playerTwoBoard
       : game.playerOneBoard;
 
-    const cellState = targetBoard.receiveAttack(x, y);
+    const { cellState, isRepeatHit, sunkShip } = targetBoard.receiveAttack(
+      x,
+      y,
+    );
+
+    if (isRepeatHit) {
+      throw new BadRequestException('Repeat hit');
+    }
 
     let outcome: AttackOutcome;
-    let sunkShip: ShipInfo | undefined;
 
     switch (cellState) {
       case CellState.MISS:
@@ -171,7 +264,6 @@ export class GamesService {
         break;
       case CellState.SUNK:
         outcome = AttackOutcome.SUNK;
-        sunkShip = this.findSunkShip(targetBoard, x, y);
         break;
       default:
         throw new BadRequestException('Invalid attack result');
@@ -202,6 +294,17 @@ export class GamesService {
     y: number,
   ): void {
     if (
+      game.status === GameStatus.PLAYER_ONE_WIN ||
+      game.status === GameStatus.PLAYER_TWO_WIN
+    ) {
+      throw new BadRequestException('Game is over');
+    }
+
+    if (game.status === GameStatus.WAITING_FOR_PLAYER_TWO) {
+      throw new BadRequestException('Game is not ready');
+    }
+
+    if (
       game.playerOne.username !== playerUsername &&
       game.playerTwo.username !== playerUsername
     ) {
@@ -224,20 +327,6 @@ export class GamesService {
     ) {
       throw new BadRequestException('Invalid attack coordinates');
     }
-  }
-
-  private findSunkShip(
-    board: Board,
-    attackX: number,
-    attackY: number,
-  ): ShipInfo {
-    // TODO: Implement this method
-    console.log(`findSunkShip: ${board} ${attackX} ${attackY}`);
-    return {
-      name: '',
-      length: 0,
-      isSunk: false,
-    };
   }
 
   private checkGameOver(targetBoard: Board): boolean {

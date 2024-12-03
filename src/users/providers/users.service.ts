@@ -36,8 +36,6 @@ export class UsersService {
       return [];
     }
 
-    console.log(games);
-
     return games.map((game) => ({
       id: game.id,
       playerOne: game.playerOne.username,

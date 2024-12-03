@@ -1,13 +1,21 @@
-export class CreateGameDto {
-  playerOneUsername: string;
-  playerOneShips: ShipConfig[];
-}
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { ShipConfig, ShipConfigDto } from './ship-config.dto';
 
-export interface ShipConfig {
-  name: string;
-  length: number;
-  startX: number;
-  startY: number;
-  isHorizontal: boolean;
-  currentHits?: number;
+export class CreateGameDto {
+  @IsString()
+  playerOneUsername: string;
+
+  @IsArray()
+  @ArrayMinSize(5)
+  @ArrayMaxSize(5)
+  @ValidateNested({ each: true })
+  @Type(() => ShipConfigDto)
+  playerOneShips: ShipConfig[];
 }

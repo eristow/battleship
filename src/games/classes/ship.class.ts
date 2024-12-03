@@ -1,8 +1,24 @@
-export class Ship {
+import { ShipType } from '../dto/ship-config.dto';
+
+export interface ShipSummary {
+  name: ShipType;
+  length: number;
+  startX?: number;
+  startY?: number;
+  isHorizontal?: boolean;
+  currentHits?: number;
+}
+
+export interface ShipData extends ShipSummary {
+  coordinates: string[];
+  isSunk: boolean;
+}
+
+export class Ship implements ShipSummary {
   public coordinates: string[] = [];
 
   constructor(
-    public name: string,
+    public name: ShipType,
     public length: number,
     public startX: number,
     public startY: number,
