@@ -2,27 +2,48 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Post,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { GameService } from '../providers/game.service';
+import { GamesService } from '../providers/games.service';
 import { CreateGameDto } from '../dto/create-game.dto';
 import { JoinGameDto } from '../dto/join-game.dto';
-import { Game } from '../entities/game.entity';
+import { Game, GameSummary } from '../entities/game.entity';
 import { MakeMoveDto } from '../dto/make-move.dto';
 import { MoveResult } from '../classes/move-result.class';
 
 @Controller('games')
-export class GameController {
-  constructor(private readonly gameService: GameService) {}
+export class GamesController {
+  constructor(private readonly gameService: GamesService) {}
 
   @Get()
-  async getAllGames(): Promise<Game[]> {
+  async getAllGames(): Promise<GameSummary[]> {
     return this.gameService.getAllGames();
+  }
+
+  @Get(':gameId')
+  async getGameById(
+    @Param('gameId', new ParseUUIDPipe()) gameId: string,
+  ): Promise<Game> {
+    return this.gameService.getGameById(gameId);
+  }
+
+  @Delete(':gameId')
+  @HttpCode(204)
+  async deleteGame(
+    @Param('gameId', new ParseUUIDPipe()) gameId: string,
+  ): Promise<void> {
+    const deletedGame = await this.gameService.deleteGame(gameId);
+
+    if (!deletedGame) {
+      throw new BadRequestException('Failed to delete game');
+    }
   }
 
   @Post()

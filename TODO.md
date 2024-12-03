@@ -2,10 +2,6 @@
 
 - [ ] Change README from boilerplate to project-specific
 
-- [ ] Create endpoint for finding a game by ID
-  - [ ] Implement `Game` service method `findById`
-  - [ ] Create endpoint in `GameController`
-
 - [ ] Add validation for hitting the same cell twice
   - Should return an error
 
@@ -14,6 +10,25 @@
   - [ ] Implement validation
   - [ ] Create endpoint for listing available ships
   - [ ] Change ship placement to use ship type instead of length
+
+- [ ] Add unit tests for `Game` service
+
+- [ ] Add unit tests for `Board` class
+
+- [ ] Add unit tests for `Ship` class
+
+- [ ] Add unit tests for `Game` controller
+
+- [ ] Add unit tests for `User` controller
+
+- [ ] Add unit tests for `User` service
+
+- [ ] Add unit tests for `MoveResult` class
+
+- [ ] Add logging
+  - [ ] Log all requests
+  - [ ] Log all responses
+  - [ ] Log all errors
 
 - [ ] Improve error response from validating ship placement
   - Return what ships are invalid and how
@@ -26,8 +41,36 @@
   - [ ] Implement user logout
   - [ ] Implement user authentication middleware
 
+- [ ] Containerize the app
+  - [ ] Create Dockerfile
+    - [ ] NestJS app
+    - [ ] PSQL server
+  - [ ] Create docker-compose file
+
+- [ ] Add CI/CD pipeline
+  - [ ] GitHub Actions
+  - [ ] Linting
+  - [ ] Testing
+  - [ ] Building
+  - [ ] Deploying
+
+- [ ] Deploy to AWS
+  - [ ] Create EC2 instance
+  - [ ] Install Docker
+  - [ ] Install Docker Compose
+  - [ ] Deploy app
+
 # DONE:
 
+- [x] Add deleting game functionality
+  - [x] Implement `Game` service method `deleteGame`
+  - [x] Create endpoint in `GameController`
+- [x] Create endpoint to list all games for a user
+  - [x] Implement `User` service method `getGamesForUser`
+  - [x] Create endpoint in `UserController`
+- [x] Create endpoint for finding a game by ID
+  - [x] Implement `Game` service method `findById`
+  - [x] Create endpoint in `GameController`
 - [x] Make usernames unique?
   - Use usernames as primary key instead of ID
 - [x] Implement making a move

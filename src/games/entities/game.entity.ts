@@ -18,6 +18,14 @@ export enum GameStatus {
   PLAYER_TWO_WIN = 'PLAYER_TWO_WIN',
 }
 
+export interface GameSummary {
+  id: string;
+  playerOne: string;
+  playerTwo: string;
+  status: GameStatus;
+  createdAt: Date;
+}
+
 const boardTransformer = {
   to: (value: Board) => value?.toJSON() ?? null,
   from: (value: BoardConfig) => {

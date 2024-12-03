@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UsersService } from '../providers/users.service';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
+import { GameSummary } from 'src/games/entities/game.entity';
 
 @Controller('users')
 export class UsersController {
@@ -10,6 +11,13 @@ export class UsersController {
   @Get()
   async getAllUsers(): Promise<User[]> {
     return this.usersService.getAllUsers();
+  }
+
+  @Get(':username')
+  async getGamesForUser(
+    @Param('username') username: string,
+  ): Promise<GameSummary[]> {
+    return this.usersService.getGamesForUser(username);
   }
 
   @Post()

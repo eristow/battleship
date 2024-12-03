@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateGameDto, ShipConfig } from '../dto/create-game.dto';
-import { Game, GameStatus } from '../entities/game.entity';
+import { Game, GameStatus, GameSummary } from '../entities/game.entity';
 import { Board, CellState } from '../classes/board.class';
 import { Ship } from '../classes/ship.class';
 import { JoinGameDto } from '../dto/join-game.dto';
@@ -14,7 +14,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class GameService {
+export class GamesService {
   constructor(
     private configService: ConfigService,
 
@@ -22,8 +22,37 @@ export class GameService {
     private gameRepository: Repository<Game>,
   ) {}
 
-  async getAllGames(): Promise<Game[]> {
-    return await this.gameRepository.find();
+  async getAllGames(): Promise<GameSummary[]> {
+    const allGames = await this.gameRepository.find({
+      relations: ['playerOne', 'playerTwo'],
+    });
+
+    return allGames.map((game) => ({
+      id: game.id,
+      playerOne: game.playerOne.username,
+      playerTwo: game.playerTwo?.username,
+      status: game.status,
+      createdAt: game.createdAt,
+    }));
+  }
+
+  async getGameById(gameId: string): Promise<Game> {
+    const game = await this.gameRepository.findOne({
+      where: { id: gameId },
+      relations: ['playerOne', 'playerTwo'],
+    });
+
+    if (!game) {
+      throw new BadRequestException('Game not found');
+    }
+
+    return game;
+  }
+
+  async deleteGame(gameId: string): Promise<boolean> {
+    const deleteResult = await this.gameRepository.delete(gameId);
+
+    return deleteResult.affected !== 0;
   }
 
   async createGame(createGameDto: CreateGameDto): Promise<Game> {
