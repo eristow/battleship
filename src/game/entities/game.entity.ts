@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Board, BoardConfig } from '../classes/board.class';
 import { User } from '../../users/entities/user.entity';
+import { Ship } from '../classes/ship.class';
 
 export enum GameStatus {
   SETUP = 'SETUP',
@@ -18,11 +19,24 @@ export enum GameStatus {
 }
 
 const boardTransformer = {
-  to: (value: Board) => value.toJSON(),
+  to: (value: Board) => value?.toJSON() ?? null,
   from: (value: BoardConfig) => {
+    if (!value) return null;
+
     const board = new Board(value.size);
-    board.setGrid(value.grid);
-    board.setShips(value.ships);
+
+    value.ships.forEach((shipData) => {
+      const ship = new Ship(
+        shipData.name,
+        shipData.length,
+        shipData.startX,
+        shipData.startY,
+        shipData.isHorizontal,
+        shipData.currentHits,
+      );
+      board.placeShip(ship);
+    });
+
     return board;
   },
 };
@@ -50,12 +64,6 @@ export class Game {
 
   @Column({ type: 'json', transformer: boardTransformer, nullable: true })
   playerTwoBoard: Board;
-
-  // @Column('json')
-  // playerOneShips: ShipConfig[];
-
-  // @Column('json', { nullable: true })
-  // playerTwoShips: ShipConfig[];
 
   @CreateDateColumn()
   createdAt: Date;

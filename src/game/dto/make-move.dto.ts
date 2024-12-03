@@ -1,5 +1,5 @@
 export class MakeMoveDto {
-  playerId: string;
+  playerUsername: string;
   x: number;
   y: number;
 }

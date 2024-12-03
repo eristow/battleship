@@ -60,7 +60,7 @@ export class GameController {
   ): Promise<MoveResult> {
     return this.gameService.makeMove(
       gameId,
-      moveDto.playerId,
+      moveDto.playerUsername,
       moveDto.x,
       moveDto.y,
     );

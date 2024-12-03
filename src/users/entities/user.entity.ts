@@ -1,11 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class User {
-  // TODO: implement this class
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column('varchar')
+  @PrimaryColumn('varchar')
   username: string;
 }

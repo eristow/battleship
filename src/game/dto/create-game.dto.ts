@@ -1,5 +1,5 @@
 export class CreateGameDto {
-  playerOneId: string;
+  playerOneUsername: string;
   playerOneShips: ShipConfig[];
 }
 

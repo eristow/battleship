@@ -40,7 +40,7 @@ export class GameService {
     }
 
     const game = this.gameRepository.create({
-      playerOne: { id: createGameDto.playerOneId },
+      playerOne: { username: createGameDto.playerOneUsername },
       status: GameStatus.WAITING_FOR_PLAYER_TWO,
       playerOneBoard: boardPlayerOne,
     });
@@ -60,7 +60,7 @@ export class GameService {
       throw new BadRequestException('Game not found');
     }
 
-    if (game.playerTwo) {
+    if (game.status !== GameStatus.WAITING_FOR_PLAYER_TWO) {
       throw new BadRequestException('Game already has two players');
     }
 
@@ -76,12 +76,10 @@ export class GameService {
     }
 
     const updateResult = await this.gameRepository.update(gameId, {
-      playerTwo: { id: joinGameDto.playerTwoId },
+      playerTwo: { username: joinGameDto.playerTwoUsername },
       playerTwoBoard: boardPlayerTwo,
       status: GameStatus.PLAYER_ONE_TURN,
     });
-
-    console.log(JSON.stringify(updateResult));
 
     if (updateResult.affected === 0) {
       throw new BadRequestException('Failed to join game');
@@ -110,7 +108,7 @@ export class GameService {
 
   async makeMove(
     gameId: string,
-    playerId: string,
+    playerUsername: string,
     x: number,
     y: number,
   ): Promise<MoveResult> {
@@ -119,14 +117,16 @@ export class GameService {
       relations: ['playerOne', 'playerTwo'],
     });
 
-    this.validateMove(game, playerId, x, y);
+    if (!game) {
+      throw new BadRequestException('Game not found');
+    }
 
-    const isPlayerOneAttacking = game.playerOne.id === playerId;
+    this.validateMove(game, playerUsername, x, y);
+
+    const isPlayerOneAttacking = game.playerOne.username === playerUsername;
     const targetBoard = isPlayerOneAttacking
       ? game.playerTwoBoard
       : game.playerOneBoard;
-
-    console.log(JSON.stringify(targetBoard));
 
     const cellState = targetBoard.receiveAttack(x, y);
 
@@ -149,11 +149,11 @@ export class GameService {
     }
 
     const isGameOver = this.checkGameOver(targetBoard);
-    const winnerId = isGameOver ? playerId : undefined;
+    const winnerId = isGameOver ? playerUsername : undefined;
 
     const moveResult = new MoveResult(
       outcome,
-      playerId,
+      playerUsername,
       x,
       y,
       sunkShip,
@@ -168,15 +168,18 @@ export class GameService {
 
   private validateMove(
     game: Game,
-    playerId: string,
+    playerUsername: string,
     x: number,
     y: number,
   ): void {
-    if (game.playerOne.id !== playerId && game.playerTwo.id !== playerId) {
+    if (
+      game.playerOne.username !== playerUsername &&
+      game.playerTwo.username !== playerUsername
+    ) {
       throw new BadRequestException('Invalid player id');
     }
 
-    const isPlayerOneAttacking = game.playerOne.id === playerId;
+    const isPlayerOneAttacking = game.playerOne.username === playerUsername;
     if (isPlayerOneAttacking && game.status !== GameStatus.PLAYER_ONE_TURN) {
       throw new BadRequestException("Not player one's turn");
     }
@@ -184,7 +187,6 @@ export class GameService {
       throw new BadRequestException("Not player two's turn");
     }
 
-    // TODO: change to use board size from config service
     if (
       x < 0 ||
       x >= game.playerOneBoard.size ||
@@ -201,7 +203,7 @@ export class GameService {
     attackY: number,
   ): ShipInfo {
     // TODO: Implement this method
-    console.log(`${board} ${attackX} ${attackY}`);
+    console.log(`findSunkShip: ${board} ${attackX} ${attackY}`);
     return {
       name: '',
       length: 0,
@@ -219,7 +221,7 @@ export class GameService {
   ): Promise<void> {
     if (moveResult.isGameOver) {
       game.status =
-        moveResult.winnerId === game.playerOne.id
+        moveResult.winnerId === game.playerOne.username
           ? GameStatus.PLAYER_ONE_WIN
           : GameStatus.PLAYER_TWO_WIN;
     } else {

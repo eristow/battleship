@@ -8,24 +8,64 @@ export enum CellState {
   SUNK,
 }
 
-export interface Cell {
-  x: number;
-  y: number;
-  state: CellState;
-}
-
 export interface BoardConfig {
   size: number;
-  grid: Cell[][];
+  grid: CellState[][];
   ships: Ship[];
 }
 
 export class Board {
-  private grid: Cell[][];
+  private grid: CellState[][];
   private ships: Ship[] = [];
+  private shipsByCoordinate: Map<string, Ship> = new Map();
 
   constructor(public size: number) {
     this.initializeGrid(size);
+  }
+
+  // Returns if the desired placement is valid.
+  placeShip(ship: Ship): boolean {
+    if (!this.isValidPlacement(ship)) {
+      return false;
+    }
+
+    this.ships.push(ship);
+
+    ship.coordinates.forEach((coord) => {
+      this.shipsByCoordinate.set(coord, ship);
+
+      const [x, y] = coord.split(',').map(Number);
+      this.grid[y][x] = CellState.SHIP;
+    });
+
+    return true;
+  }
+
+  receiveAttack(x: number, y: number): CellState {
+    const coord = `${x},${y}`;
+    const ship = this.shipsByCoordinate.get(coord);
+
+    if (!ship) {
+      this.grid[y][x] = CellState.MISS;
+      return CellState.MISS;
+    }
+
+    ship.hit();
+
+    if (ship.isSunk()) {
+      ship.coordinates.forEach((shipCoord) => {
+        const [x, y] = shipCoord.split(',').map(Number);
+        this.grid[y][x] = CellState.SUNK;
+      });
+      return CellState.SUNK;
+    }
+
+    this.grid[y][x] = CellState.HIT;
+    return CellState.HIT;
+  }
+
+  checkGameOver(): boolean {
+    return this.ships.every((ship) => ship.isSunk());
   }
 
   toJSON(): BoardConfig {
@@ -36,76 +76,23 @@ export class Board {
     };
   }
 
-  // Returns if the desired placement is valid.
-  placeShip(ship: Ship): boolean {
-    // TODO: Add validation for ship out of grid bounds.
-    // TODO: Add validation for ship overlap.
-    // TODO: Actually place the ship on the grid.
-    this.ships.push(ship);
-
-    for (let i = 0; i < ship.length; i++) {
-      const x = ship.isHorizontal ? ship.startX + i : ship.startX;
-      const y = ship.isHorizontal ? ship.startY : ship.startY + i;
-      this.grid[y][x].state = CellState.SHIP;
-    }
-
-    return true;
-  }
-
-  receiveAttack(x: number, y: number): CellState {
-    const cell = this.grid[y][x];
-    console.log(`receiveAttack: ${x} ${y} ${cell.state}`);
-
-    switch (cell.state) {
-      case CellState.EMPTY:
-        cell.state = CellState.MISS;
-        return CellState.MISS;
-      case CellState.SHIP:
-        cell.state = CellState.HIT;
-        return CellState.HIT;
-      default:
-        return cell.state;
-    }
-  }
-
-  checkGameOver(): boolean {
-    return this.ships.every((ship) => ship.isSunk());
-  }
-
-  setGrid(grid: Cell[][]): void {
-    this.grid = grid.map((row: Cell[]) =>
-      row.map(
-        (cell: Cell) =>
-          ({
-            x: cell.x,
-            y: cell.y,
-            state: cell.state,
-          }) as Cell,
-      ),
-    );
-  }
-
-  setShips(ships: Ship[]): void {
-    this.ships = ships.map(
-      (ship: Ship) =>
-        new Ship(
-          ship.name,
-          ship.length,
-          ship.startX,
-          ship.startY,
-          ship.isHorizontal,
-          ship.currentHits,
-        ),
-    );
-  }
-
   private initializeGrid(size: number): void {
-    this.grid = Array.from({ length: size }, (_, y) =>
-      Array.from({ length: size }, (_, x) => ({
-        x,
-        y,
-        state: CellState.EMPTY,
-      })),
+    this.grid = Array.from({ length: size }, () =>
+      Array.from({ length: size }, () => CellState.EMPTY),
     );
+  }
+
+  private isValidPlacement(ship: Ship): boolean {
+    return ship.coordinates.every((coord) => {
+      const [x, y] = coord.split(',').map(Number);
+
+      return (
+        x >= 0 &&
+        x < this.size &&
+        y >= 0 &&
+        y < this.size &&
+        this.grid[y][x] === CellState.EMPTY
+      );
+    });
   }
 }
