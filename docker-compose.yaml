@@ -1,28 +1,40 @@
-version: '3'
 services:
   app:
+    container_name: app
+    image: battleship-app
     build:
       context: .
       dockerfile: ./docker/app/Dockerfile
     ports:
       - '3000:3000'
     volumes:
-      - .:/app
+      - .:/usr/src/app
     depends_on:
-      - db
-    environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=postgres
-      - BOARD_SIZE=10
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.development.docker
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+      interval: 60s
+      timeout: 30s
+      retries: 5
+      start_period: 5s
+    command: pnpm start:dev
 
   db:
+    container_name: db
+    image: battleship-db
     build:
       context: .
       dockerfile: ./docker/db/Dockerfile
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env.development.docker
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 60s
+      timeout: 30s
+      retries: 5
+      start_period: 3s

@@ -9,6 +9,7 @@ import { JoinGameDto } from '../dto/join-game.dto';
 import { AttackOutcome, MoveResult } from '../classes/move-result.class';
 import { ConfigService } from '@nestjs/config';
 import { SHIP_LENGTHS, ShipConfig, ShipType } from '../dto/ship-config.dto';
+import { User } from 'src/users/entities/user.entity';
 
 interface ShipValidationResult {
   isValid: boolean;
@@ -24,6 +25,9 @@ export class GamesService {
 
     @InjectRepository(Game)
     private gameRepository: Repository<Game>,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async getAllGames(): Promise<GameSummary[]> {
@@ -67,6 +71,13 @@ export class GamesService {
   }
 
   async createGame(createGameDto: CreateGameDto): Promise<Game> {
+    const user = await this.userRepository.findOne({
+      where: { username: createGameDto.playerOneUsername },
+    });
+    if (!user) {
+      throw new BadRequestException('Player one not found');
+    }
+
     const validation = this.validateShipTypes(createGameDto.playerOneShips);
     if (!validation.isValid) {
       throw new BadRequestException(validation.error);
@@ -103,6 +114,13 @@ export class GamesService {
   }
 
   async joinGame(gameId: string, joinGameDto: JoinGameDto): Promise<Game> {
+    const user = await this.userRepository.findOne({
+      where: { username: joinGameDto.playerTwoUsername },
+    });
+    if (!user) {
+      throw new BadRequestException('Player two not found');
+    }
+
     const validation = this.validateShipTypes(joinGameDto.playerTwoShips);
     if (!validation.isValid) {
       throw new BadRequestException(validation.error);

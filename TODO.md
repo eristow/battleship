@@ -2,11 +2,10 @@
 
 - [ ] Change README from boilerplate to project-specific
 
-- [ ] Containerize the app
-  - [ ] Create Dockerfile
-    - [ ] NestJS app
-    - [ ] PSQL server
-  - [ ] Create docker-compose file
+- [ ] Add healthcheck endpoint to app
+  - [ ] Implement healthcheck endpoint
+  - [ ] Add healthcheck to Dockerfile
+  - [ ] Add healthcheck to docker-compose
 
 - [ ] Add unit tests for `Game` service
 
@@ -47,6 +46,10 @@
   - [ ] Protect endpoints with authentication middleware
     - Create/join/delete game
     - Make move
+  
+  - [ ] Combine `CreateGameDto` and `JoinGameDto` into `CreateGameDto`
+
+  - [ ] Reduce code duplication between `createGame` and `joinGame`
 
 - [ ] Split up `Game` service
 
@@ -54,6 +57,14 @@
 
 # DONE:
 
+- [x] Prevent game from being created with non-existent user
+- [x] Containerize the app
+  - [x] Setup hot reloading
+  - [x] Ensure app runs after db
+  - [x] Create Dockerfile
+    - [x] NestJS app
+    - [x] PSQL server
+  - [x] Create docker-compose file
 - [x] Add logging
   - [x] Log all requests
   - [x] Log all responses
