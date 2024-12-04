@@ -2,19 +2,14 @@
 
 - [ ] Change README from boilerplate to project-specific
 
-- [ ] Add unit tests for `Game` service
-
-- [ ] Add unit tests for `Board` class
-
-- [ ] Add unit tests for `Ship` class
-
-- [ ] Add unit tests for `Game` controller
-
-- [ ] Add unit tests for `User` controller
-
-- [ ] Add unit tests for `User` service
-
-- [ ] Add unit tests for `MoveResult` class
+- [ ] Tests:
+  - [ ] Add unit tests for `User` controller
+  - [ ] Add unit tests for `User` service
+  - [ ] Add unit tests for `MoveResult` class
+  - [ ] Add unit tests for `Ship` class
+  - [ ] Add unit tests for `Board` class
+  - [ ] Add unit tests for `Game` controller
+  - [ ] Add unit tests for `Game` service
 
 - [ ] Add CI/CD pipeline
   - [ ] GitHub Actions

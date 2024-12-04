@@ -1,15 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from '../providers/users.service';
-import { UsersController } from './users.controller';
-import { User } from '../entities/user.entity';
-import { Repository } from 'typeorm';
-import { MockType } from '../../testing/mock-type';
+import { TestingModule, Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { repositoryMockFactory } from '../../testing/repository-mock-factory';
 import { Game } from '../../games/entities/game.entity';
+import { MockType } from '../../testing/mock-type';
+import { repositoryMockFactory } from '../../testing/repository-mock-factory';
+import { Repository } from 'typeorm';
+import { UsersController } from '../controllers/users.controller';
+import { User } from '../entities/user.entity';
+import { UsersService } from './users.service';
 
-describe('UsersController', () => {
-  let controller: UsersController;
+describe('UsersService', () => {
+  let service: UsersService;
   let userRepositoryMock: MockType<Repository<User>>;
   let gameRepositoryMock: MockType<Repository<Game>>;
 
@@ -29,13 +29,13 @@ describe('UsersController', () => {
       ],
     }).compile();
 
-    controller = module.get<UsersController>(UsersController);
+    service = module.get<UsersService>(UsersService);
     userRepositoryMock = module.get(getRepositoryToken(User));
     gameRepositoryMock = module.get(getRepositoryToken(Game));
   });
 
   it('should be defined', () => {
-    expect(controller).toBeDefined();
+    expect(service).toBeDefined();
     expect(userRepositoryMock).toBeDefined();
     expect(gameRepositoryMock).toBeDefined();
   });
@@ -45,7 +45,7 @@ describe('UsersController', () => {
 
     userRepositoryMock.find.mockReturnValue(users);
 
-    expect(await controller.getAllUsers()).toEqual(users);
+    expect(await service.getAllUsers()).toEqual(users);
   });
 
   it('should return games for a user', async () => {
@@ -70,7 +70,7 @@ describe('UsersController', () => {
 
     gameRepositoryMock.find.mockReturnValue(games);
 
-    expect(await controller.getGamesForUser(username)).toEqual(expectedGames);
+    expect(await service.getGamesForUser(username)).toEqual(expectedGames);
   });
 
   it('should create a user', async () => {
@@ -80,15 +80,26 @@ describe('UsersController', () => {
     userRepositoryMock.create.mockReturnValue(user);
     userRepositoryMock.save.mockReturnValue(user);
 
-    expect(await controller.createUser(createUserDto)).toEqual(user);
+    expect(await service.createUser(createUserDto)).toEqual(user);
   });
 
-  it('should handle empty users array', async () => {
-    userRepositoryMock.find.mockReturnValue([]);
-    expect(await controller.getAllUsers()).toEqual([]);
+  it('should handle empty games array', async () => {
+    const username = 'test';
+
+    gameRepositoryMock.find.mockReturnValue([]);
+
+    expect(await service.getGamesForUser(username)).toEqual([]);
   });
 
-  it('should handle games with multiple players', async () => {
+  it('should handle null games response', async () => {
+    const username = 'test';
+
+    gameRepositoryMock.find.mockReturnValue(null);
+
+    expect(await service.getGamesForUser(username)).toEqual([]);
+  });
+
+  it('should handle games with both players', async () => {
     const games = [
       {
         id: 1,
@@ -110,11 +121,7 @@ describe('UsersController', () => {
     ];
 
     gameRepositoryMock.find.mockReturnValue(games);
-    expect(await controller.getGamesForUser('player1')).toEqual(expectedGames);
-  });
 
-  it('should handle non-existent username', async () => {
-    gameRepositoryMock.find.mockReturnValue([]);
-    expect(await controller.getGamesForUser('nonexistent')).toEqual([]);
+    expect(await service.getGamesForUser('player1')).toEqual(expectedGames);
   });
 });
