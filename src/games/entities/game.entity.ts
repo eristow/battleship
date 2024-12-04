@@ -26,7 +26,7 @@ export interface GameSummary {
   createdAt: Date;
 }
 
-const boardTransformer = {
+export const boardTransformer = {
   to: (value: Board) => value?.toJSON() ?? null,
   from: (value: BoardConfig) => {
     if (!value) return null;

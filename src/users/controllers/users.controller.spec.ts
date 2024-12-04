@@ -7,17 +7,22 @@ import { MockType } from '../../testing/mock-type';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { repositoryMockFactory } from '../../testing/repository-mock-factory';
 import { Game } from '../../games/entities/game.entity';
+import { usersServiceFactory } from '../../testing/users-service-mock-factory';
 
 describe('UsersController', () => {
   let controller: UsersController;
   let userRepositoryMock: MockType<Repository<User>>;
   let gameRepositoryMock: MockType<Repository<Game>>;
+  let usersServiceMock: MockType<UsersService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
-        UsersService,
+        {
+          provide: UsersService,
+          useFactory: usersServiceFactory,
+        },
         {
           provide: getRepositoryToken(User),
           useFactory: repositoryMockFactory,
@@ -32,6 +37,7 @@ describe('UsersController', () => {
     controller = module.get<UsersController>(UsersController);
     userRepositoryMock = module.get(getRepositoryToken(User));
     gameRepositoryMock = module.get(getRepositoryToken(Game));
+    usersServiceMock = module.get(UsersService);
   });
 
   it('should be defined', () => {
@@ -44,6 +50,7 @@ describe('UsersController', () => {
     const users = [{ username: 'test' }];
 
     userRepositoryMock.find.mockReturnValue(users);
+    usersServiceMock.getAllUsers.mockReturnValue(users);
 
     expect(await controller.getAllUsers()).toEqual(users);
   });
@@ -69,6 +76,7 @@ describe('UsersController', () => {
     const username = 'test';
 
     gameRepositoryMock.find.mockReturnValue(games);
+    usersServiceMock.getGamesForUser.mockReturnValue(expectedGames);
 
     expect(await controller.getGamesForUser(username)).toEqual(expectedGames);
   });
@@ -79,12 +87,15 @@ describe('UsersController', () => {
 
     userRepositoryMock.create.mockReturnValue(user);
     userRepositoryMock.save.mockReturnValue(user);
+    usersServiceMock.createUser.mockReturnValue(user);
 
     expect(await controller.createUser(createUserDto)).toEqual(user);
   });
 
   it('should handle empty users array', async () => {
     userRepositoryMock.find.mockReturnValue([]);
+    usersServiceMock.getAllUsers.mockReturnValue([]);
+
     expect(await controller.getAllUsers()).toEqual([]);
   });
 
@@ -110,11 +121,15 @@ describe('UsersController', () => {
     ];
 
     gameRepositoryMock.find.mockReturnValue(games);
+    usersServiceMock.getGamesForUser.mockReturnValue(expectedGames);
+
     expect(await controller.getGamesForUser('player1')).toEqual(expectedGames);
   });
 
   it('should handle non-existent username', async () => {
     gameRepositoryMock.find.mockReturnValue([]);
+    usersServiceMock.getGamesForUser.mockReturnValue([]);
+
     expect(await controller.getGamesForUser('nonexistent')).toEqual([]);
   });
 });

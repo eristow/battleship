@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { GameModule } from './games/game.module';
+import { GameModule } from './games/games.module';
 import { User } from './users/entities/user.entity';
 import { Game } from './games/entities/game.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';

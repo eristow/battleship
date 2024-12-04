@@ -9,7 +9,7 @@ import { JoinGameDto } from '../dto/join-game.dto';
 import { AttackOutcome, MoveResult } from '../classes/move-result.class';
 import { ConfigService } from '@nestjs/config';
 import { SHIP_LENGTHS, ShipConfig, ShipType } from '../dto/ship-config.dto';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 
 interface ShipValidationResult {
   isValid: boolean;

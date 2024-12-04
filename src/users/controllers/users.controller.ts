@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UsersService } from '../providers/users.service';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { GameSummary } from 'src/games/entities/game.entity';
+import { GameSummary } from '../../games/entities/game.entity';
 
 @Controller('users')
 export class UsersController {
