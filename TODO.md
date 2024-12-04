@@ -2,18 +2,12 @@
 
 - [ ] Change README from boilerplate to project-specific
 
-- [ ] Add CI/CD pipeline
-  - [ ] GitHub Actions
-  - [ ] Linting
-  - [ ] Testing
-  - [ ] Building
-  - [ ] Deploying
-
 - [ ] Deploy to AWS
   - [ ] Create EC2 instance
   - [ ] Install Docker
   - [ ] Install Docker Compose
   - [ ] Deploy app
+	- [ ] Add deployment to CI/CD pipeline
 
 # STRETCH GOALS:
 
@@ -38,6 +32,11 @@
 
 # DONE:
 
+- [x] Add CI/CD pipeline
+  - [x] GitHub Actions
+  - [x] Linting
+  - [x] Testing
+  - [x] Building
 - [x] Tests:
   - [x] Add unit tests for `User` controller
   - [x] Add unit tests for `User` service
