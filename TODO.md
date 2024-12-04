@@ -30,6 +30,10 @@
 
 - [ ] Add logging for services and classes
 
+- [ ] Use AWS RDS instead of PSQL container?
+
+- [ ] Use CloudFormation or TF to define infra?
+
 # DONE:
 
 - [x] Add CI/CD pipeline
