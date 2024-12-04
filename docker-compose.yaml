@@ -15,12 +15,12 @@ services:
     env_file:
       - .env.development.docker
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
-      interval: 60s
+      test: ['CMD-SHELL', './docker/app/healthcheck.sh']
+      interval: 30s
       timeout: 30s
       retries: 5
-      start_period: 5s
-    command: pnpm start:dev
+      start_period: 3s
+    command: sh -c "chmod +x ./docker/app/healthcheck.sh && pnpm start:dev"
 
   db:
     container_name: db
@@ -34,7 +34,7 @@ services:
       - .env.development.docker
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
-      interval: 60s
+      interval: 30s
       timeout: 30s
       retries: 5
       start_period: 3s

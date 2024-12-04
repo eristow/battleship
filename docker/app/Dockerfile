@@ -4,14 +4,20 @@ WORKDIR /usr/src/app
 
 COPY package.json pnpm-lock.yaml ./
 
+RUN apk --no-cache add curl
+
 RUN npm install -g pnpm && pnpm install
 
 COPY ./ ./
 
 RUN pnpm build
 
-EXPOSE 3000
+COPY ./docker/app/healthcheck.sh ./healthcheck.sh
 
-HEALTHCHECK --interval=60s --timeout=30s --retries=5 --start-period=5s CMD [ "curl -f http://localhost:3000/health" ]
+RUN chmod +x ./healthcheck.sh
+
+HEALTHCHECK --interval=30s --timeout=30s --retries=5 --start-period=3s CMD [ "sh", "./healthcheck.sh" ]
+
+EXPOSE 3000
 
 CMD ["pnpm", "start:prod"]

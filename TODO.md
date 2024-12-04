@@ -2,11 +2,6 @@
 
 - [ ] Change README from boilerplate to project-specific
 
-- [ ] Add healthcheck endpoint to app
-  - [ ] Implement healthcheck endpoint
-  - [ ] Add healthcheck to Dockerfile
-  - [ ] Add healthcheck to docker-compose
-
 - [ ] Add unit tests for `Game` service
 
 - [ ] Add unit tests for `Board` class
@@ -57,6 +52,10 @@
 
 # DONE:
 
+- [x] Add healthcheck endpoint to app
+  - [x] Implement healthcheck endpoint
+  - [x] Add healthcheck to Dockerfile
+  - [x] Add healthcheck to docker-compose
 - [x] Prevent game from being created with non-existent user
 - [x] Containerize the app
   - [x] Setup hot reloading
