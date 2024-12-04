@@ -25,6 +25,10 @@ export class Ship implements ShipSummary {
     public isHorizontal: boolean,
     public currentHits: number = 0,
   ) {
+    if (length < 1) {
+      throw new Error('Ship length must be at least 1');
+    }
+
     this.calculateCoordinates();
   }
 
