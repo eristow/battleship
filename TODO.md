@@ -7,7 +7,7 @@
   - [x] Add unit tests for `User` service
   - [x] Add unit tests for `MoveResult` class
   - [x] Add unit tests for `Ship` class
-  - [ ] Add unit tests for `Board` class
+  - [x] Add unit tests for `Board` class
   - [ ] Add unit tests for `Game` controller
   - [ ] Add unit tests for `Game` service
 

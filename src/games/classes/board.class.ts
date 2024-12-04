@@ -46,13 +46,13 @@ export class Board {
     const coord = `${x},${y}`;
     const ship = this.shipsByCoordinate.get(coord);
 
-    console.log('coord', coord);
-    console.log('ship', JSON.stringify(ship));
-    console.log('this.grid[y][x]', this.grid[y][x]);
+    // console.log('coord', coord);
+    // console.log('ship', JSON.stringify(ship));
+    // console.log('this.grid[y][x]', this.grid[y][x]);
 
     // Determine if this is a repeat hit
     if (this.grid[y][x] !== CellState.EMPTY) {
-      console.log('REPEAT HIT');
+      // console.log('REPEAT HIT');
       return {
         cellState: CellState.MISS,
         isRepeatHit: true,
@@ -62,9 +62,9 @@ export class Board {
 
     // Determine if this is a miss, hit, or sink
     if (!ship) {
-      console.log('MISS');
+      // console.log('MISS');
       this.grid[y][x] = CellState.MISS;
-      console.log('this.grid[y][x]', this.grid[y][x]);
+      // console.log('this.grid[y][x]', this.grid[y][x]);
       return {
         cellState: CellState.MISS,
         isRepeatHit: false,
@@ -75,7 +75,7 @@ export class Board {
     ship.hit();
 
     if (ship.isSunk()) {
-      console.log('SUNK');
+      // console.log('SUNK');
       ship.coordinates.forEach((shipCoord) => {
         const [x, y] = shipCoord.split(',').map(Number);
         this.grid[y][x] = CellState.SUNK;
@@ -93,7 +93,7 @@ export class Board {
       };
     }
 
-    console.log('HIT');
+    // console.log('HIT');
     this.grid[y][x] = CellState.HIT;
     return {
       cellState: CellState.HIT,
@@ -149,7 +149,7 @@ export class Board {
     if (shipOutOfBounds) {
       error = `${ship.name} out of bounds`;
     } else if (existingShip) {
-      error = `${existingShip.name} already exists at coordinates: ${ship.coordinates.join(', ')}`;
+      error = `${existingShip.name} already exists at coordinates: ${ship.coordinates.join('; ')}`;
     }
 
     return {
