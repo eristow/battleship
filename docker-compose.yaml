@@ -1,0 +1,40 @@
+services:
+  app:
+    container_name: app
+    image: battleship-app
+    build:
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.development.docker
+    healthcheck:
+      test: ['CMD-SHELL', './docker/app/healthcheck.sh']
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 3s
+    command: sh -c "chmod +x ./docker/app/healthcheck.sh && pnpm start:dev"
+
+  db:
+    container_name: db
+    image: battleship-db
+    build:
+      context: .
+      dockerfile: ./docker/db/Dockerfile
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env.development.docker
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 3s
