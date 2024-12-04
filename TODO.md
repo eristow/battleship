@@ -3,9 +3,9 @@
 - [ ] Change README from boilerplate to project-specific
 
 - [ ] Tests:
-  - [ ] Add unit tests for `User` controller
-  - [ ] Add unit tests for `User` service
-  - [ ] Add unit tests for `MoveResult` class
+  - [x] Add unit tests for `User` controller
+  - [x] Add unit tests for `User` service
+  - [x] Add unit tests for `MoveResult` class
   - [ ] Add unit tests for `Ship` class
   - [ ] Add unit tests for `Board` class
   - [ ] Add unit tests for `Game` controller
