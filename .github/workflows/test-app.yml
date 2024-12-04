@@ -107,12 +107,6 @@ jobs:
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      # - name: Login to Docker Hub
-      #   uses: docker/login-action@v3
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
       
       - name: Build
         uses: docker/build-push-action@v6
@@ -122,30 +116,47 @@ jobs:
           push: false
           tags: user/battleship-${{ matrix.service-name }}:latest
 
-  # docker-push:
-  #   name: Build and Push Docker Image
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       service-name: [ "app", "db" ]
+  docker-push:
+    name: Build and Push Docker Image
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        service-name: [ "app", "db" ]
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Setup Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
-
-  #     - name: Login to Docker Hub
-  #       uses: docker/login-action@v3
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
       
-  #     - name: Build
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         context: .
-  #         file: ./docker/${{ matrix.service-name }}/Dockerfile
-  #         push: true
-  #         tags: $${{ secrets.DOCKERHUB_USERNAME }}/battleship:battleship_${{ matrix.service-name }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build, tag, and push image to Amazon ECR
+        # uses: docker/build-push-action@v6
+        # with:
+        #   context: .
+        #   file: ./docker/${{ matrix.service-name }}/Dockerfile
+        #   push: true
+        #   provenance: false
+        #   tags: ${{ steps.meta.outputs.tags }}
+        #   platforms: linux/amd64
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/battleship-${{ matrix.service-name }}:$IMAGE_TAG -f ./docker/${{ matrix.service-name }}/Dockerfile .
+
+          docker tag $ECR_REGISTRY/battleship/${{ matrix.service-name }}:$IMAGE_TAG $ECR_REGISTRY/battleship/${{ matrix.service-name }}:latest
+
+          docker push $ECR_REGISTRY/battleship-${{ matrix.service-name }}:$IMAGE_TAG
