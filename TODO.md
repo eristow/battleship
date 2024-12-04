@@ -2,15 +2,6 @@
 
 - [ ] Change README from boilerplate to project-specific
 
-- [ ] Tests:
-  - [x] Add unit tests for `User` controller
-  - [x] Add unit tests for `User` service
-  - [x] Add unit tests for `MoveResult` class
-  - [x] Add unit tests for `Ship` class
-  - [x] Add unit tests for `Board` class
-  - [x] Add unit tests for `Game` controller
-  - [ ] Add unit tests for `Game` service
-
 - [ ] Add CI/CD pipeline
   - [ ] GitHub Actions
   - [ ] Linting
@@ -47,6 +38,14 @@
 
 # DONE:
 
+- [x] Tests:
+  - [x] Add unit tests for `User` controller
+  - [x] Add unit tests for `User` service
+  - [x] Add unit tests for `MoveResult` class
+  - [x] Add unit tests for `Ship` class
+  - [x] Add unit tests for `Board` class
+  - [x] Add unit tests for `Game` controller
+  - [x] Add unit tests for `Game` service
 - [x] Add healthcheck endpoint to app
   - [x] Implement healthcheck endpoint
   - [x] Add healthcheck to Dockerfile

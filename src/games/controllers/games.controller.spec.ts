@@ -53,160 +53,174 @@ describe('GamesController', () => {
     expect(gameServiceMock).toBeDefined();
   });
 
-  it('should get all games', async () => {
-    const gameSummary: GameSummary = {
-      id: '123',
-      playerOne: 'player1',
-      playerTwo: 'player2',
-      status: GameStatus.SETUP,
-      createdAt: new Date(),
-    };
+  describe('getAllGames', () => {
+    it('should get all games', async () => {
+      const gameSummary: GameSummary = {
+        id: '123',
+        playerOne: 'player1',
+        playerTwo: 'player2',
+        status: GameStatus.SETUP,
+        createdAt: new Date(),
+      };
 
-    gameServiceMock.getAllGames.mockReturnValue([gameSummary]);
+      gameServiceMock.getAllGames.mockReturnValue([gameSummary]);
 
-    const result = await controller.getAllGames();
+      const result = await controller.getAllGames();
 
-    expect(result).toEqual([gameSummary]);
+      expect(result).toEqual([gameSummary]);
+    });
   });
 
-  it('should get valid ships', () => {
-    const shipSummary: ShipSummary = {
-      name: ShipType.BATTLESHIP,
-      length: 5,
-    };
+  describe('getValidShips', () => {
+    it('should get valid ships', () => {
+      const shipSummary: ShipSummary = {
+        name: ShipType.BATTLESHIP,
+        length: 5,
+      };
 
-    gameServiceMock.getValidShips.mockReturnValue([shipSummary]);
+      gameServiceMock.getValidShips.mockReturnValue([shipSummary]);
 
-    const result = controller.getValidShips();
+      const result = controller.getValidShips();
 
-    expect(result).toEqual([shipSummary]);
+      expect(result).toEqual([shipSummary]);
+    });
   });
 
-  it('should get game by id', async () => {
-    const game: Game = {
-      id: '123',
-      playerOne: new User(),
-      playerTwo: null,
-      status: GameStatus.SETUP,
-      playerOneBoard: new Board(10),
-      playerTwoBoard: null,
-      createdAt: new Date(),
-    };
+  describe('getGameById', () => {
+    it('should get game by id', async () => {
+      const game: Game = {
+        id: '123',
+        playerOne: new User(),
+        playerTwo: null,
+        status: GameStatus.SETUP,
+        playerOneBoard: new Board(10),
+        playerTwoBoard: null,
+        createdAt: new Date(),
+      };
 
-    gameServiceMock.getGameById.mockReturnValue(game);
+      gameServiceMock.getGameById.mockReturnValue(game);
 
-    const result = await controller.getGameById('123');
+      const result = await controller.getGameById('123');
 
-    expect(result).toEqual(game);
+      expect(result).toEqual(game);
+    });
   });
 
-  it('should delete game', () => {
-    const gameId = '123';
+  describe('deleteGame', () => {
+    it('should delete game', () => {
+      const gameId = '123';
 
-    gameServiceMock.deleteGame.mockReturnValue(true);
+      gameServiceMock.deleteGame.mockReturnValue(true);
 
-    controller.deleteGame(gameId);
+      controller.deleteGame(gameId);
 
-    expect(gameServiceMock.deleteGame).toHaveBeenCalledWith(gameId);
+      expect(gameServiceMock.deleteGame).toHaveBeenCalledWith(gameId);
+    });
+
+    it('should throw when deleting game fails', async () => {
+      const gameId = '123';
+
+      gameServiceMock.deleteGame.mockReturnValue(false);
+
+      await expect(controller.deleteGame(gameId)).rejects.toThrow(
+        'Failed to delete game',
+      );
+    });
   });
 
-  it('should throw when deleting game fails', async () => {
-    const gameId = '123';
+  describe('createGame', () => {
+    it('should create game', async () => {
+      const createGameDto: CreateGameDto = {
+        playerOneUsername: 'player1',
+        playerOneShips: [],
+      };
 
-    gameServiceMock.deleteGame.mockReturnValue(false);
+      const game: Game = {
+        id: '123',
+        playerOne: new User(),
+        playerTwo: null,
+        status: GameStatus.SETUP,
+        playerOneBoard: new Board(10),
+        playerTwoBoard: null,
+        createdAt: new Date(),
+      };
 
-    await expect(controller.deleteGame(gameId)).rejects.toThrow(
-      'Failed to delete game',
-    );
+      gameServiceMock.createGame.mockReturnValue(game);
+
+      const result = await controller.createGame(createGameDto);
+
+      expect(result).toEqual(game);
+    });
+
+    it('should throw when creating game fails', async () => {
+      const createGameDto: CreateGameDto = {
+        playerOneUsername: 'player1',
+        playerOneShips: [],
+      };
+
+      gameServiceMock.createGame.mockReturnValue(null);
+
+      await expect(controller.createGame(createGameDto)).rejects.toThrow();
+    });
   });
 
-  it('should create game', async () => {
-    const createGameDto: CreateGameDto = {
-      playerOneUsername: 'player1',
-      playerOneShips: [],
-    };
+  describe('joinGame', () => {
+    it('should join game', async () => {
+      const gameId = '123';
+      const joinGameDto: JoinGameDto = {
+        playerTwoUsername: 'player2',
+        playerTwoShips: [],
+      };
 
-    const game: Game = {
-      id: '123',
-      playerOne: new User(),
-      playerTwo: null,
-      status: GameStatus.SETUP,
-      playerOneBoard: new Board(10),
-      playerTwoBoard: null,
-      createdAt: new Date(),
-    };
+      const game: Game = {
+        id: '123',
+        playerOne: new User(),
+        playerTwo: new User(),
+        status: GameStatus.SETUP,
+        playerOneBoard: new Board(10),
+        playerTwoBoard: new Board(10),
+        createdAt: new Date(),
+      };
 
-    gameServiceMock.createGame.mockReturnValue(game);
+      gameServiceMock.joinGame.mockReturnValue(game);
 
-    const result = await controller.createGame(createGameDto);
+      const result = await controller.joinGame(gameId, joinGameDto);
 
-    expect(result).toEqual(game);
+      expect(result).toEqual(game);
+    });
+
+    it('should throw when joining game fails', async () => {
+      const gameId = '123';
+      const joinGameDto: JoinGameDto = {
+        playerTwoUsername: 'player2',
+        playerTwoShips: [],
+      };
+
+      gameServiceMock.joinGame.mockReturnValue(null);
+
+      await expect(controller.joinGame(gameId, joinGameDto)).rejects.toThrow();
+    });
   });
 
-  it('should throw when creating game fails', async () => {
-    const createGameDto: CreateGameDto = {
-      playerOneUsername: 'player1',
-      playerOneShips: [],
-    };
+  describe('makeMove', () => {
+    it('should make a move', () => {
+      const gameId = '123';
+      const move: MakeMoveDto = {
+        playerUsername: 'player1',
+        x: 1,
+        y: 1,
+      };
 
-    gameServiceMock.createGame.mockReturnValue(null);
+      gameServiceMock.makeMove.mockReturnValue(true);
 
-    await expect(controller.createGame(createGameDto)).rejects.toThrow();
-  });
+      controller.makeMove(gameId, move);
 
-  it('should join game', async () => {
-    const gameId = '123';
-    const joinGameDto: JoinGameDto = {
-      playerTwoUsername: 'player2',
-      playerTwoShips: [],
-    };
-
-    const game: Game = {
-      id: '123',
-      playerOne: new User(),
-      playerTwo: new User(),
-      status: GameStatus.SETUP,
-      playerOneBoard: new Board(10),
-      playerTwoBoard: new Board(10),
-      createdAt: new Date(),
-    };
-
-    gameServiceMock.joinGame.mockReturnValue(game);
-
-    const result = await controller.joinGame(gameId, joinGameDto);
-
-    expect(result).toEqual(game);
-  });
-
-  it('should throw when joining game fails', async () => {
-    const gameId = '123';
-    const joinGameDto: JoinGameDto = {
-      playerTwoUsername: 'player2',
-      playerTwoShips: [],
-    };
-
-    gameServiceMock.joinGame.mockReturnValue(null);
-
-    await expect(controller.joinGame(gameId, joinGameDto)).rejects.toThrow();
-  });
-
-  it('should make a move', () => {
-    const gameId = '123';
-    const move: MakeMoveDto = {
-      playerUsername: 'player1',
-      x: 1,
-      y: 1,
-    };
-
-    gameServiceMock.makeMove.mockReturnValue(true);
-
-    controller.makeMove(gameId, move);
-
-    expect(gameServiceMock.makeMove).toHaveBeenCalledWith(
-      gameId,
-      move.playerUsername,
-      move.x,
-      move.y,
-    );
+      expect(gameServiceMock.makeMove).toHaveBeenCalledWith(
+        gameId,
+        move.playerUsername,
+        move.x,
+        move.y,
+      );
+    });
   });
 });
