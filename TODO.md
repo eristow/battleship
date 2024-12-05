@@ -3,8 +3,10 @@
 - [ ] Change README from boilerplate to project-specific
 
 - [ ] Deploy to AWS
-  - [ ] Figure out Application Load Balancer
   - [ ] Fix CD pipeline
+    - Should deploy using correct ECS cluster
+  - [x] Connect to RDS with DBeaver
+  - [x] Figure out Application Load Balancer
   - [x] Figure out CloudWatch log groups
   - [x] Setup ECS cluster
   - [x] Deploy app
@@ -13,8 +15,11 @@
 
 # STRETCH GOALS:
 
-- [ ] Ensure app is using SSL to connect to RDS
-  - https://stackoverflow.com/a/78269214/28325682
+- [ ] Ensure app is using SSL
+  - [ ] To connect to RDS
+    - https://stackoverflow.com/a/78269214/28325682
+  - [ ] For between the app and LB
+  - [ ] For between the LB and the client
 
 - [ ] Add user authentication?
   - https://docs.nestjs.com/security/authentication
@@ -27,9 +32,9 @@
     - Create/join/delete game
     - Make move
   
-  - [ ] Combine `CreateGameDto` and `JoinGameDto` into `CreateGameDto`
+- [ ] Combine `CreateGameDto` and `JoinGameDto` into `CreateGameDto`
 
-  - [ ] Reduce code duplication between `createGame` and `joinGame`
+- [ ] Reduce code duplication between `createGame` and `joinGame`
 
 - [ ] Split up `Game` service
 

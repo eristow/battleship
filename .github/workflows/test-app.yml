@@ -181,12 +181,11 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
-        # TODO: Fix the task-definition revision number
         run: |
           aws ecs update-service \
-            --cluster battleship \
-            --service battleship-app-service \
-            --task-definition battleship-app-task:${{ vars.APP_TASK_REVISION }} \
+            --cluster battleship-fargate \
+            --service battleship-app-service-fargate \
+            --task-definition battleship-app-task-fargate:${{ vars.APP_TASK_REVISION }} \
             --force-new-deployment
 
 # aws ecs update-service \
