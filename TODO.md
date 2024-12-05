@@ -1,17 +1,5 @@
 # TODO:
 
-- [ ] Change README from boilerplate to project-specific
-
-- [ ] Deploy to AWS
-  - [ ] Fix CD pipeline
-    - Should deploy using correct ECS cluster
-  - [x] Connect to RDS with DBeaver
-  - [x] Figure out Application Load Balancer
-  - [x] Figure out CloudWatch log groups
-  - [x] Setup ECS cluster
-  - [x] Deploy app
-  - [x] Deploy PSQL
-	- [x] Add deployment to CI/CD pipeline
 
 # STRETCH GOALS:
 
@@ -42,8 +30,20 @@
 
 - [ ] Use CloudFormation or TF to define infra?
 
+
 # DONE:
 
+- [x] Change README from boilerplate to project-specific
+- [x] Deploy to AWS
+  - [x] Fix CD pipeline
+    - Should deploy using correct ECS cluster
+  - [x] Connect to RDS with DBeaver
+  - [x] Figure out Application Load Balancer
+  - [x] Figure out CloudWatch log groups
+  - [x] Setup ECS cluster
+  - [x] Deploy app
+  - [x] Deploy PSQL
+	- [x] Add deployment to CI/CD pipeline
 - [x] Use AWS RDS instead of PSQL container?
 - [x] Add CI/CD pipeline
   - [x] GitHub Actions
