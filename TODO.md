@@ -3,13 +3,18 @@
 - [ ] Change README from boilerplate to project-specific
 
 - [ ] Deploy to AWS
-  - [ ] Create EC2 instance
-  - [ ] Install Docker
-  - [ ] Install Docker Compose
-  - [ ] Deploy app
-	- [ ] Add deployment to CI/CD pipeline
+  - [ ] Figure out Application Load Balancer
+  - [ ] Fix CD pipeline
+  - [x] Figure out CloudWatch log groups
+  - [x] Setup ECS cluster
+  - [x] Deploy app
+  - [x] Deploy PSQL
+	- [x] Add deployment to CI/CD pipeline
 
 # STRETCH GOALS:
+
+- [ ] Ensure app is using SSL to connect to RDS
+  - https://stackoverflow.com/a/78269214/28325682
 
 - [ ] Add user authentication?
   - https://docs.nestjs.com/security/authentication
@@ -28,14 +33,13 @@
 
 - [ ] Split up `Game` service
 
-- [ ] Add logging for services and classes
-
-- [ ] Use AWS RDS instead of PSQL container?
+- [ ] Add logging for services and classes (app-level logging)
 
 - [ ] Use CloudFormation or TF to define infra?
 
 # DONE:
 
+- [x] Use AWS RDS instead of PSQL container?
 - [x] Add CI/CD pipeline
   - [x] GitHub Actions
   - [x] Linting

@@ -14,6 +14,15 @@ export class HealthController {
     private db: TypeOrmHealthIndicator,
   ) {}
 
+  @Get()
+  @HealthCheck()
+  checkAll() {
+    return this.health.check([
+      () => this.http.pingCheck('ships', 'http://localhost:3000/games/ships'),
+      () => this.db.pingCheck('database'),
+    ]);
+  }
+
   @Get('http')
   @HealthCheck()
   check() {

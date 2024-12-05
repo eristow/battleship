@@ -162,9 +162,6 @@ jobs:
     needs: docker-push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    strategy:
-      matrix:
-        service-name: [ "app", "db" ]
 
     steps:
       - uses: actions/checkout@v4
@@ -184,9 +181,16 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
+        # TODO: Fix the task-definition revision number
         run: |
           aws ecs update-service \
             --cluster battleship \
-            --service battleship-${{ matrix.service-name }}-service \
-            --task-definition battleship-${{ matrix.service-name }}-task:${{ github.run_number }} \
+            --service battleship-app-service \
+            --task-definition battleship-app-task:${{ vars.APP_TASK_REVISION }} \
             --force-new-deployment
+
+# aws ecs update-service \
+#   --cluster battleship \
+#   --service battleship-db-service \
+#   --task-definition battleship-db-task:${{ vars.DB_TASK_REVISION }} \
+#   --force-new-deployment
