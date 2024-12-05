@@ -1,16 +1,14 @@
 import { Module } from '@nestjs/common';
-import { GamesController } from './controllers/games.controller';
-import { GamesService } from './providers/games.service';
-import { Game } from './entities/game.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthController } from './controllers/auth.controller';
+import { AuthService } from './services/auth.service';
+import { UsersModule } from '../users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { User } from 'src/users/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { AuthGuard } from './guards/auth.guard';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    TypeOrmModule.forFeature([Game, User]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -21,8 +19,9 @@ import { JwtModule } from '@nestjs/jwt';
       }),
       inject: [ConfigService],
     }),
+    UsersModule,
   ],
-  controllers: [GamesController],
-  providers: [GamesService],
+  controllers: [AuthController],
+  providers: [AuthService, AuthGuard],
 })
-export class GameModule {}
+export class AuthModule {}

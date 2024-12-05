@@ -91,7 +91,9 @@ export class GamesService {
         }) as ShipSummary,
     );
 
-    const boardPlayerOne = new Board(this.configService.get('BOARD_SIZE'));
+    const boardPlayerOne = new Board(
+      this.configService.get<number>('BOARD_SIZE'),
+    );
 
     const playerOneShipsPlaced = this.placeShips(
       shipsWithLengths,

@@ -14,6 +14,7 @@ import { ShipType } from '../dto/ship-config.dto';
 import { Ship, ShipSummary } from '../classes/ship.class';
 import { JoinGameDto } from '../dto/join-game.dto';
 import { AttackOutcome, MoveResult } from '../classes/move-result.class';
+import { JwtService } from '@nestjs/jwt';
 
 describe('GamesService', () => {
   let service: GamesService;
@@ -25,6 +26,7 @@ describe('GamesService', () => {
       imports: [ConfigModule],
       controllers: [GamesController],
       providers: [
+        JwtService,
         GamesService,
         {
           provide: getRepositoryToken(Game),
@@ -52,8 +54,8 @@ describe('GamesService', () => {
     it('should get all games', async () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
-        playerTwo: { username: 'playerTwo' },
+        playerOne: { username: 'playerOne', password: 'password1' },
+        playerTwo: { username: 'playerTwo', password: 'password2' },
         status: GameStatus.SETUP,
         playerOneBoard: new Board(10),
         playerTwoBoard: new Board(10),
@@ -78,8 +80,8 @@ describe('GamesService', () => {
     it('should get a game by id', async () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
-        playerTwo: { username: 'playerTwo' },
+        playerOne: { username: 'playerOne', password: 'password1' },
+        playerTwo: { username: 'playerTwo', password: 'password2' },
         status: GameStatus.SETUP,
         playerOneBoard: new Board(10),
         playerTwoBoard: new Board(10),
@@ -131,7 +133,7 @@ describe('GamesService', () => {
     it('should create a game', async () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
+        playerOne: { username: 'playerOne', password: 'password1' },
         playerTwo: null,
         status: GameStatus.SETUP,
         playerOneBoard: new Board(10),
@@ -248,7 +250,7 @@ describe('GamesService', () => {
     it('should join a game', async () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
+        playerOne: { username: 'playerOne', password: 'password1' },
         playerTwo: undefined,
         status: GameStatus.WAITING_FOR_PLAYER_TWO,
         playerOneBoard: new Board(10),
@@ -518,8 +520,8 @@ describe('GamesService', () => {
     it('should make a move for playerOne', async () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
-        playerTwo: { username: 'playerTwo' },
+        playerOne: { username: 'playerOne', password: 'password1' },
+        playerTwo: { username: 'playerTwo', password: 'password2' },
         status: GameStatus.PLAYER_ONE_TURN,
         playerOneBoard: new Board(10),
         playerTwoBoard: new Board(10),
@@ -544,8 +546,8 @@ describe('GamesService', () => {
     it('should make a move for playerTwo', async () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
-        playerTwo: { username: 'playerTwo' },
+        playerOne: { username: 'playerOne', password: 'password1' },
+        playerTwo: { username: 'playerTwo', password: 'password2' },
         status: GameStatus.PLAYER_TWO_TURN,
         playerOneBoard: new Board(10),
         playerTwoBoard: new Board(10),
@@ -578,8 +580,8 @@ describe('GamesService', () => {
     it('should throw when repeat hit', () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
-        playerTwo: { username: 'playerTwo' },
+        playerOne: { username: 'playerOne', password: 'password1' },
+        playerTwo: { username: 'playerTwo', password: 'password2' },
         status: GameStatus.PLAYER_ONE_TURN,
         playerOneBoard: new Board(10),
         playerTwoBoard: new Board(10),
@@ -605,8 +607,8 @@ describe('GamesService', () => {
     // it('should throw when attack result is invalid', () => {
     //   const game: Game = {
     //     id: '123',
-    //     playerOne: { username: 'playerOne' },
-    //     playerTwo: { username: 'playerTwo' },
+    //     playerOne: { username: 'playerOne', password: 'password1' },
+    //     playerTwo: { username: 'playerTwo', password: 'password2' },
     //     status: GameStatus.PLAYER_ONE_TURN,
     //     playerOneBoard: new Board(10),
     //     playerTwoBoard: new Board(10),
@@ -627,8 +629,8 @@ describe('GamesService', () => {
     it('should throw when game is not ready', () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
-        playerTwo: { username: 'playerTwo' },
+        playerOne: { username: 'playerOne', password: 'password1' },
+        playerTwo: { username: 'playerTwo', password: 'password2' },
         status: GameStatus.SETUP,
         playerOneBoard: new Board(10),
         playerTwoBoard: new Board(10),
@@ -644,8 +646,8 @@ describe('GamesService', () => {
     it('should throw when game is over', () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
-        playerTwo: { username: 'playerTwo' },
+        playerOne: { username: 'playerOne', password: 'password1' },
+        playerTwo: { username: 'playerTwo', password: 'password2' },
         status: GameStatus.PLAYER_ONE_WIN,
         playerOneBoard: new Board(10),
         playerTwoBoard: new Board(10),
@@ -661,8 +663,8 @@ describe('GamesService', () => {
     it('should throw when player is not in the game', () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
-        playerTwo: { username: 'playerTwo' },
+        playerOne: { username: 'playerOne', password: 'password1' },
+        playerTwo: { username: 'playerTwo', password: 'password2' },
         status: GameStatus.PLAYER_ONE_TURN,
         playerOneBoard: new Board(10),
         playerTwoBoard: new Board(10),
@@ -678,8 +680,8 @@ describe('GamesService', () => {
     it("should throw when not playerOne's turn", () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
-        playerTwo: { username: 'playerTwo' },
+        playerOne: { username: 'playerOne', password: 'password1' },
+        playerTwo: { username: 'playerTwo', password: 'password2' },
         status: GameStatus.PLAYER_TWO_TURN,
         playerOneBoard: new Board(10),
         playerTwoBoard: new Board(10),
@@ -695,8 +697,8 @@ describe('GamesService', () => {
     it("should throw when not playerTwo's turn", () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
-        playerTwo: { username: 'playerTwo' },
+        playerOne: { username: 'playerOne', password: 'password1' },
+        playerTwo: { username: 'playerTwo', password: 'password2' },
         status: GameStatus.PLAYER_ONE_TURN,
         playerOneBoard: new Board(10),
         playerTwoBoard: new Board(10),
@@ -712,8 +714,8 @@ describe('GamesService', () => {
     it('should throw when coordinates are invalid', () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
-        playerTwo: { username: 'playerTwo' },
+        playerOne: { username: 'playerOne', password: 'password1' },
+        playerTwo: { username: 'playerTwo', password: 'password2' },
         status: GameStatus.PLAYER_ONE_TURN,
         playerOneBoard: new Board(10),
         playerTwoBoard: new Board(10),
@@ -729,8 +731,8 @@ describe('GamesService', () => {
     it('should switch turns after a successful attack', async () => {
       const game: Game = {
         id: '123',
-        playerOne: { username: 'playerOne' },
-        playerTwo: { username: 'playerTwo' },
+        playerOne: { username: 'playerOne', password: 'password1' },
+        playerTwo: { username: 'playerTwo', password: 'password2' },
         status: GameStatus.PLAYER_ONE_TURN,
         playerOneBoard: new Board(10),
         playerTwoBoard: new Board(10),

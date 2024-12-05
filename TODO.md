@@ -11,14 +11,14 @@
 
 - [ ] Add user authentication?
   - https://docs.nestjs.com/security/authentication
-  - [ ] Implement JWT
-  - [ ] Implement user registration
-  - [ ] Implement user login
-  - [ ] Implement user logout
-  - [ ] Implement user authentication middleware
-  - [ ] Protect endpoints with authentication middleware
+  - [x] Store passwords on `User` entity
+  - [x] Ensure to use `bcrypt` to store pass, and `bcrypt` on incoming pass to compare
+  - [ ] Protect endpoints
     - Create/join/delete game
     - Make move
+  - [ ] Add JWT_SECRET and BCRYPT_ROUNDS to env vars
+    - [x] Docker local
+    - [ ] AWS prod
   
 - [ ] Combine `CreateGameDto` and `JoinGameDto` into `CreateGameDto`
 

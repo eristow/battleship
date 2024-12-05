@@ -46,90 +46,115 @@ describe('UsersController', () => {
     expect(gameRepositoryMock).toBeDefined();
   });
 
-  it('should return all users', async () => {
-    const users = [{ username: 'test' }];
+  describe('getAllUsers', () => {
+    it('should return all users', async () => {
+      const users = [{ username: 'test' }];
 
-    userRepositoryMock.find.mockReturnValue(users);
-    usersServiceMock.getAllUsers.mockReturnValue(users);
+      userRepositoryMock.find.mockReturnValue(users);
+      usersServiceMock.getAllUsers.mockReturnValue(users);
 
-    expect(await controller.getAllUsers()).toEqual(users);
+      expect(await controller.getAllUsers()).toEqual(users);
+    });
   });
 
-  it('should return games for a user', async () => {
-    const games = [
-      {
-        id: 1,
-        playerOne: { username: 'test' },
-        status: 'in_progress',
-        createdAt: new Date(),
-      },
-    ];
-    const expectedGames = [
-      {
-        id: 1,
-        playerOne: 'test',
-        playerTwo: undefined,
-        status: 'in_progress',
-        createdAt: new Date(),
-      },
-    ];
-    const username = 'test';
+  describe('getUserByUsername', () => {
+    it('should return a user with given username', async () => {
+      const username = 'test';
+      const user = { username: username };
 
-    gameRepositoryMock.find.mockReturnValue(games);
-    usersServiceMock.getGamesForUser.mockReturnValue(expectedGames);
+      usersServiceMock.getUserByUsername.mockReturnValue(user);
 
-    expect(await controller.getGamesForUser(username)).toEqual(expectedGames);
+      expect(await controller.getUserByUsername(username)).toEqual(user);
+    });
+
+    it('should throw when no user exists with username', () => {
+      usersServiceMock.getUserByUsername.mockReturnValue(null);
+
+      expect(() => controller.getUserByUsername('test')).rejects.toThrow();
+    });
   });
 
-  it('should create a user', async () => {
-    const createUserDto = { username: 'test' };
-    const user = { username: 'test' };
+  describe('createUser', () => {
+    it('should create a user', async () => {
+      const createUserDto = { username: 'test', password: 'password' };
+      const user = { username: 'test', password: 'password' };
 
-    userRepositoryMock.create.mockReturnValue(user);
-    userRepositoryMock.save.mockReturnValue(user);
-    usersServiceMock.createUser.mockReturnValue(user);
+      userRepositoryMock.create.mockReturnValue(user);
+      userRepositoryMock.save.mockReturnValue(user);
+      usersServiceMock.createUser.mockReturnValue(user);
 
-    expect(await controller.createUser(createUserDto)).toEqual(user);
+      expect(await controller.createUser(createUserDto)).toEqual(user);
+    });
   });
 
-  it('should handle empty users array', async () => {
-    userRepositoryMock.find.mockReturnValue([]);
-    usersServiceMock.getAllUsers.mockReturnValue([]);
+  describe('getGamesForUser', () => {
+    it('should return games for a user', async () => {
+      const games = [
+        {
+          id: 1,
+          playerOne: { username: 'test' },
+          status: 'in_progress',
+          createdAt: new Date(),
+        },
+      ];
+      const expectedGames = [
+        {
+          id: 1,
+          playerOne: 'test',
+          playerTwo: undefined,
+          status: 'in_progress',
+          createdAt: new Date(),
+        },
+      ];
+      const username = 'test';
 
-    expect(await controller.getAllUsers()).toEqual([]);
-  });
+      gameRepositoryMock.find.mockReturnValue(games);
+      usersServiceMock.getGamesForUser.mockReturnValue(expectedGames);
 
-  it('should handle games with multiple players', async () => {
-    const games = [
-      {
-        id: 1,
-        playerOne: { username: 'player1' },
-        playerTwo: { username: 'player2' },
-        status: 'completed',
-        createdAt: new Date(),
-      },
-    ];
+      expect(await controller.getGamesForUser(username)).toEqual(expectedGames);
+    });
 
-    const expectedGames = [
-      {
-        id: 1,
-        playerOne: 'player1',
-        playerTwo: 'player2',
-        status: 'completed',
-        createdAt: games[0].createdAt,
-      },
-    ];
+    it('should handle empty users array', async () => {
+      userRepositoryMock.find.mockReturnValue([]);
+      usersServiceMock.getAllUsers.mockReturnValue([]);
 
-    gameRepositoryMock.find.mockReturnValue(games);
-    usersServiceMock.getGamesForUser.mockReturnValue(expectedGames);
+      expect(await controller.getAllUsers()).toEqual([]);
+    });
 
-    expect(await controller.getGamesForUser('player1')).toEqual(expectedGames);
-  });
+    it('should handle games with multiple players', async () => {
+      const games = [
+        {
+          id: 1,
+          playerOne: { username: 'player1' },
+          playerTwo: { username: 'player2' },
+          status: 'completed',
+          createdAt: new Date(),
+        },
+      ];
 
-  it('should handle non-existent username', async () => {
-    gameRepositoryMock.find.mockReturnValue([]);
-    usersServiceMock.getGamesForUser.mockReturnValue([]);
+      const expectedGames = [
+        {
+          id: 1,
+          playerOne: 'player1',
+          playerTwo: 'player2',
+          status: 'completed',
+          createdAt: games[0].createdAt,
+        },
+      ];
 
-    expect(await controller.getGamesForUser('nonexistent')).toEqual([]);
+      gameRepositoryMock.find.mockReturnValue(games);
+      usersServiceMock.getGamesForUser.mockReturnValue(expectedGames);
+
+      expect(await controller.getGamesForUser('player1')).toEqual(
+        expectedGames,
+      );
+    });
+
+    it('should handle non-existent username', async () => {
+      gameRepositoryMock.find.mockReturnValue([]);
+      usersServiceMock.getGamesForUser.mockReturnValue([]);
+
+      expect(await controller.getGamesForUser('nonexistent')).toEqual([]);
+    });
   });
 });

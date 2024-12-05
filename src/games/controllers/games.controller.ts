@@ -8,6 +8,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -18,6 +19,7 @@ import { Game, GameSummary } from '../entities/game.entity';
 import { MakeMoveDto } from '../dto/make-move.dto';
 import { MoveResult } from '../classes/move-result.class';
 import { ShipSummary } from '../classes/ship.class';
+import { AuthGuard } from '../../auth/guards/auth.guard';
 
 @Controller('games')
 export class GamesController {
@@ -53,6 +55,7 @@ export class GamesController {
   }
 
   @Post()
+  @UseGuards(AuthGuard)
   @UsePipes(new ValidationPipe())
   async createGame(@Body() createGameDto: CreateGameDto): Promise<Game> {
     const createdGame = await this.gameService.createGame(createGameDto);
@@ -65,6 +68,7 @@ export class GamesController {
   }
 
   @Post(':gameId/join')
+  @UseGuards(AuthGuard)
   @UsePipes(new ValidationPipe())
   async joinGame(
     @Param('gameId', new ParseUUIDPipe()) gameId: string,
@@ -80,6 +84,7 @@ export class GamesController {
   }
 
   @Post(':gameId/move')
+  @UseGuards(AuthGuard)
   @UsePipes(new ValidationPipe())
   async makeMove(
     @Param('gameId', new ParseUUIDPipe()) gameId: string,

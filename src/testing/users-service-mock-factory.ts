@@ -9,5 +9,6 @@ export const usersServiceFactory: () => MockType<UsersService<any>> = jest.fn(
     getAllUsers: jest.fn(() => Promise<User[]>),
     createUser: jest.fn(() => Promise<User>),
     getGamesForUser: jest.fn(() => Promise<GameSummary[]>),
+    getUserByUsername: jest.fn(() => Promise<User>),
   }),
 );

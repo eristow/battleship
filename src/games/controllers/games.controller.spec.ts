@@ -14,6 +14,9 @@ import { Board } from '../classes/board.class';
 import { CreateGameDto } from '../dto/create-game.dto';
 import { JoinGameDto } from '../dto/join-game.dto';
 import { MakeMoveDto } from '../dto/make-move.dto';
+import { JwtService } from '@nestjs/jwt';
+import { AuthGuard } from '../../auth/guards/auth.guard';
+import { ConfigModule } from '@nestjs/config';
 
 describe('GamesController', () => {
   let controller: GamesController;
@@ -23,8 +26,11 @@ describe('GamesController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [ConfigModule],
       controllers: [GamesController],
       providers: [
+        JwtService,
+        AuthGuard,
         {
           provide: GamesService,
           useFactory: gamesServiceFactory,

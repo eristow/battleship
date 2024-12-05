@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { HealthModule } from './health/health.module';
 import { AppController } from './app.controller';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { AppController } from './app.controller';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        url: configService.get('DATABASE_URL'),
+        url: configService.get<string>('DATABASE_URL'),
         entities: [User, Game],
         synchronize: true,
       }),
@@ -25,6 +26,7 @@ import { AppController } from './app.controller';
     HealthModule,
     GameModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [],
