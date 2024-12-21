@@ -1,12 +1,5 @@
 import { IsEnum, IsNumber, Min, IsBoolean } from 'class-validator';
-
-export enum ShipType {
-  CARRIER = 'Carrier',
-  BATTLESHIP = 'Battleship',
-  SUBMARINE = 'Submarine',
-  DESTROYER = 'Destroyer',
-  PATROL_BOAT = 'Patrol Boat',
-}
+import { ShipType } from '@battleship/types';
 
 export const SHIP_LENGTHS: Record<ShipType, number> = {
   [ShipType.CARRIER]: 5,

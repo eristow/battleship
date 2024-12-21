@@ -1,14 +1,37 @@
 services:
-  app:
-    container_name: app
-    image: battleship-app
+  frontend:
+    container_name: frontend
+    image: battleship-frontend
     build:
       context: .
-      dockerfile: ./docker/app/Dockerfile
+      dockerfile: ./apps/frontend/Dockerfile
+    ports:
+      - '5173:5173'
+    volumes:
+      - .:/usr/src/frontend
+    depends_on:
+      app:
+        condition: service_healthy
+    env_file:
+      - .env.development.docker
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:3000 || exit 1']
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 3s
+    command: pnpm dev --open
+
+  backend:
+    container_name: backend
+    image: battleship-backend
+    build:
+      context: .
+      dockerfile: ./apps/backend/Dockerfile
     ports:
       - '3000:3000'
     volumes:
-      - .:/usr/src/app
+      - .:/usr/src/backend
     depends_on:
       db:
         condition: service_healthy
@@ -27,7 +50,7 @@ services:
     image: battleship-db
     build:
       context: .
-      dockerfile: ./docker/db/Dockerfile
+      dockerfile: ./apps/db/Dockerfile
     ports:
       - '5432:5432'
     env_file:

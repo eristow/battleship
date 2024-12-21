@@ -17,7 +17,7 @@ import { JoinGameDto } from '../dto/join-game.dto';
 import { Game, GameSummary } from '../entities/game.entity';
 import { MakeMoveDto } from '../dto/make-move.dto';
 import { MoveResult } from '../classes/move-result.class';
-import { ShipSummary } from '../classes/ship.class';
+import { ShipSummary } from '@battleship/types';
 
 @Controller('games')
 export class GamesController {

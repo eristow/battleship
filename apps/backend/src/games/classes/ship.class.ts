@@ -1,13 +1,4 @@
-import { ShipType } from '../dto/ship-config.dto';
-
-export interface ShipSummary {
-  name: ShipType;
-  length: number;
-  startX?: number;
-  startY?: number;
-  isHorizontal?: boolean;
-  currentHits?: number;
-}
+import { ShipType, ShipSummary } from '@battleship/types';
 
 export interface ShipData extends ShipSummary {
   coordinates: string[];

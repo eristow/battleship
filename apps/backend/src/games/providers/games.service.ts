@@ -4,12 +4,13 @@ import { Repository } from 'typeorm';
 import { CreateGameDto } from '../dto/create-game.dto';
 import { Game, GameStatus, GameSummary } from '../entities/game.entity';
 import { Board, CellState } from '../classes/board.class';
-import { Ship, ShipSummary } from '../classes/ship.class';
+import { Ship } from '../classes/ship.class';
 import { JoinGameDto } from '../dto/join-game.dto';
 import { AttackOutcome, MoveResult } from '../classes/move-result.class';
 import { ConfigService } from '@nestjs/config';
-import { SHIP_LENGTHS, ShipConfig, ShipType } from '../dto/ship-config.dto';
+import { SHIP_LENGTHS, ShipConfig } from '../dto/ship-config.dto';
 import { User } from '../../users/entities/user.entity';
+import { ShipSummary, ShipType } from '@battleship/types';
 
 interface ShipValidationResult {
   isValid: boolean;
