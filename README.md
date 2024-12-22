@@ -12,3 +12,11 @@ docker build -t battleship-backend -f docker/backend/Dockerfile .
 docker build -t battleship-frontend -f docker/frontend/Dockerfile .
 docker build -t battleship-db -f docker/db/Dockerfile .
 ```
+
+### Docker Compose
+
+```bash
+cd ROOT_OF_PROJECT
+docker-compose build
+docker-compose up
+```

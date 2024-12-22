@@ -18,11 +18,9 @@ COPY ./apps/backend/package.json ./apps/backend/pnpm-lock.yaml ./
 
 RUN npm install -g pnpm && pnpm install
 
-COPY ./apps/backend ./
+COPY ./apps/backend/ ./
 
 RUN pnpm build
-
-COPY ./docker/backend/healthcheck.sh ./healthcheck.sh
 
 RUN chmod +x ./healthcheck.sh
 

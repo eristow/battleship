@@ -17,6 +17,8 @@ coverage
 
 # build output
 .vercel
+dist/
+.svelte-kit/
 
 # OS-specific
 .DS_Store
