@@ -19,7 +19,7 @@ services:
       interval: 60s
       timeout: 30s
       retries: 5
-      start_period: 1s
+      start_period: 5s
     command: pnpm dev
 
   backend:
@@ -32,9 +32,9 @@ services:
       - '3000:3000'
     volumes:
       - ./apps/backend:/usr/src/app/apps/backend
-    depends_on:
-      db:
-        condition: service_healthy
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
     env_file:
       - .env.development.docker
     healthcheck:
@@ -42,7 +42,7 @@ services:
       interval: 60s
       timeout: 30s
       retries: 5
-      start_period: 1s
+      start_period: 12s
     command: sh -c "chmod +x ./healthcheck.sh && pnpm dev"
 
   db:
@@ -60,4 +60,4 @@ services:
       interval: 60s
       timeout: 30s
       retries: 5
-      start_period: 1s
+      start_period: 2s

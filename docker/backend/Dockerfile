@@ -24,7 +24,7 @@ RUN pnpm build
 
 RUN chmod +x ./healthcheck.sh
 
-HEALTHCHECK --interval=30s --timeout=30s --retries=5 --start-period=3s CMD [ "sh", "./healthcheck.sh" ]
+HEALTHCHECK --interval=60s --timeout=30s --retries=5 --start-period=3s CMD [ "sh", "./healthcheck.sh" ]
 
 EXPOSE 3000
 
